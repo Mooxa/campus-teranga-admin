@@ -103,6 +103,14 @@ export default function DashboardPage() {
           <div className="space-y-2">
             <h3 className="text-lg font-semibold text-neutral-900">Authentication Required</h3>
             <p className="text-sm text-neutral-500">Please log in to access the dashboard.</p>
+            <div className="mt-4">
+              <a
+                href="/login"
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+              >
+                Go to Login
+              </a>
+            </div>
           </div>
         </div>
       </div>
