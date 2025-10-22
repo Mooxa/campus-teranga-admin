@@ -377,7 +377,180 @@ export default function ServicesPage() {
             )}
           </div>
         </div>
+
+        {/* Create Service Modal */}
+        {showCreateModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-6 border-b border-neutral-200">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-bold text-neutral-900">Create New Service</h2>
+                  <button
+                    onClick={() => setShowCreateModal(false)}
+                    className="p-2 text-neutral-400 hover:text-neutral-600 rounded-lg hover:bg-neutral-100 transition-colors duration-200"
+                  >
+                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div className="p-6">
+                <ServiceForm
+                  onSubmit={async (serviceData) => {
+                    try {
+                      await adminAPI.createService(serviceData);
+                      setShowCreateModal(false);
+                      fetchServices();
+                    } catch (error) {
+                      console.error('Failed to create service:', error);
+                    }
+                  }}
+                  onCancel={() => setShowCreateModal(false)}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Edit Service Modal */}
+        {editingService && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-6 border-b border-neutral-200">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-bold text-neutral-900">Edit Service</h2>
+                  <button
+                    onClick={() => setEditingService(null)}
+                    className="p-2 text-neutral-400 hover:text-neutral-600 rounded-lg hover:bg-neutral-100 transition-colors duration-200"
+                  >
+                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div className="p-6">
+                <ServiceForm
+                  service={editingService}
+                  onSubmit={async (serviceData) => {
+                    try {
+                      await adminAPI.updateService(editingService._id, serviceData);
+                      setEditingService(null);
+                      fetchServices();
+                    } catch (error) {
+                      console.error('Failed to update service:', error);
+                    }
+                  }}
+                  onCancel={() => setEditingService(null)}
+                />
+              </div>
+            </div>
+          </div>
+        )}
       </AdminLayout>
     </ProtectedRoute>
+  );
+}
+
+// Service Form Component
+interface ServiceFormProps {
+  service?: Service;
+  onSubmit: (data: Partial<Service>) => void;
+  onCancel: () => void;
+}
+
+function ServiceForm({ service, onSubmit, onCancel }: ServiceFormProps) {
+  const [formData, setFormData] = useState({
+    title: service?.title || '',
+    description: service?.description || '',
+    category: service?.category || 'transport',
+    isActive: service?.isActive ?? true,
+  });
+
+  const categories = ['transport', 'housing', 'procedures', 'health', 'other'];
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit(formData);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div>
+        <label className="block text-sm font-medium text-neutral-700 mb-2">
+          Service Title *
+        </label>
+        <input
+          type="text"
+          value={formData.title}
+          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+          className="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
+          placeholder="Enter service title"
+          required
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-neutral-700 mb-2">
+          Description *
+        </label>
+        <textarea
+          value={formData.description}
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          rows={4}
+          className="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
+          placeholder="Enter service description"
+          required
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-neutral-700 mb-2">
+          Category *
+        </label>
+        <select
+          value={formData.category}
+          onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+          className="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
+          required
+        >
+          {categories.map(category => (
+            <option key={category} value={category}>
+              {category.charAt(0).toUpperCase() + category.slice(1)}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="flex items-center">
+        <input
+          type="checkbox"
+          id="isActive"
+          checked={formData.isActive}
+          onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+          className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-neutral-300 rounded"
+        />
+        <label htmlFor="isActive" className="ml-2 block text-sm text-neutral-700">
+          Active Service
+        </label>
+      </div>
+
+      <div className="flex justify-end space-x-4 pt-6 border-t border-neutral-200">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="px-6 py-3 border border-neutral-200 text-neutral-700 font-medium rounded-xl hover:bg-neutral-50 transition-colors duration-200"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          className="px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-medium rounded-xl hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200"
+        >
+          {service ? 'Update Service' : 'Create Service'}
+        </button>
+      </div>
+    </form>
   );
 }
