@@ -7,7 +7,7 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (phoneNumber: string, password: string) => Promise<void>;
+  login: (phoneNumber: string, password: string) => Promise<User>;
   register: (fullName: string, phoneNumber: string, email: string | undefined, password: string, confirmPassword: string) => Promise<void>;
   logout: () => void;
 }
@@ -58,6 +58,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (user) {
         localStorage.setItem('adminToken', response.token);
         setUser(user);
+        return user;
       } else {
         throw new Error('Failed to authenticate user.');
       }

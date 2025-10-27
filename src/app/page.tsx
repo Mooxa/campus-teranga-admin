@@ -15,8 +15,8 @@ export default function HomePage() {
         if (user.role === 'admin' || user.role === 'super_admin') {
           router.replace('/dashboard');
         } else {
-          // Regular users stay on landing or can browse formations/events/services
-          router.replace('/landing');
+          // Regular users go to home page to browse formations/events/services
+          router.replace('/home');
         }
       } else {
         // User is not authenticated, redirect to landing page

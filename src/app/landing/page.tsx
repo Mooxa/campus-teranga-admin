@@ -229,7 +229,7 @@ export default function LandingPage() {
                       if (user.role === 'admin' || user.role === 'super_admin') {
                         router.push('/dashboard');
                       } else {
-                        router.push('/formations'); // Regular users see formations/events/services
+                        router.push('/home'); // Regular users see formations/events/services
                       }
                     }}
                     className="flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-orange-50 border border-orange-200"
@@ -294,7 +294,7 @@ export default function LandingPage() {
                         if (user.role === 'admin' || user.role === 'super_admin') {
                           router.push('/dashboard');
                         } else {
-                          router.push('/formations');
+                          router.push('/home');
                         }
                       }}
                       className="block w-full text-center text-orange-600 hover:text-orange-700 px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:bg-orange-50 border border-orange-200"

@@ -10,14 +10,19 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
-  const { login, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { login, isAuthenticated, user, isLoading: authLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (isAuthenticated) {
-      router.push('/dashboard');
+    if (isAuthenticated && user) {
+      // Redirect based on user role
+      if (user.role === 'admin' || user.role === 'super_admin') {
+        router.push('/dashboard');
+      } else {
+        router.push('/home');
+      }
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, user, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,8 +30,16 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      await login(phoneNumber, password);
-      router.push('/dashboard');
+      const loggedInUser = await login(phoneNumber, password);
+      
+      // Redirect based on user role
+      setTimeout(() => {
+        if (loggedInUser.role === 'admin' || loggedInUser.role === 'super_admin') {
+          router.push('/dashboard');
+        } else {
+          router.push('/home');
+        }
+      }, 100);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Login failed');
     } finally {
