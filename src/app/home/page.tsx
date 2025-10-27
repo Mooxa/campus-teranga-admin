@@ -85,14 +85,14 @@ export default function HomePage() {
         fetch(`${apiUrl}/api/services?isActive=true`)
       ]);
 
-      const formations = await formationsRes.json();
-      const events = await eventsRes.json();
-      const services = await servicesRes.json();
+      const formationsJson = await formationsRes.json();
+      const eventsJson = await eventsRes.json();
+      const servicesJson = await servicesRes.json();
 
       setContent({
-        formations: formations.data || formations,
-        events: events.data || events,
-        services: services.data || services
+        formations: Array.isArray(formationsJson.data) ? formationsJson.data : (Array.isArray(formationsJson) ? formationsJson : []),
+        events: Array.isArray(eventsJson.data) ? eventsJson.data : (Array.isArray(eventsJson) ? eventsJson : []),
+        services: Array.isArray(servicesJson.data) ? servicesJson.data : (Array.isArray(servicesJson) ? servicesJson : [])
       });
     } catch (error) {
       console.error('Failed to fetch content:', error);
