@@ -133,6 +133,17 @@ export const authAPI = {
     return response.data;
   },
   
+  register: async (fullName: string, phoneNumber: string, email: string | undefined, password: string, confirmPassword: string) => {
+    const response = await api.post('/auth/register', { 
+      fullName, 
+      phoneNumber, 
+      email: email || undefined, 
+      password, 
+      confirmPassword 
+    });
+    return response.data;
+  },
+  
   getMe: async () => {
     const response = await api.get('/auth/me');
     return response.data.data || response.data;

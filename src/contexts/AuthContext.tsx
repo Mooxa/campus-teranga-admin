@@ -66,29 +66,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const register = async (fullName: string, phoneNumber: string, email: string | undefined, password: string, confirmPassword: string) => {
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-      const response = await fetch(`${apiUrl}/api/auth/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          fullName,
-          phoneNumber,
-          email: email || undefined,
-          password,
-          confirmPassword,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Registration failed');
-      }
-
-      // Registration successful - redirect to login
-      return;
+      await authAPI.register(fullName, phoneNumber, email, password, confirmPassword);
     } catch (error) {
       throw error;
     }
