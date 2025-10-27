@@ -31,8 +31,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (token) {
         try {
           const response = await authAPI.getMe();
-          if (response.user && (response.user.role === 'admin' || response.user.role === 'super_admin')) {
-            setUser(response.user);
+          const user = response.user || response;
+          if (user && (user.role === 'admin' || user.role === 'super_admin')) {
+            setUser(user);
           } else {
             localStorage.removeItem('adminToken');
           }
@@ -49,10 +50,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (phoneNumber: string, password: string) => {
     try {
       const response = await authAPI.login(phoneNumber, password);
+      const user = response.user || response;
       
-      if (response.user && (response.user.role === 'admin' || response.user.role === 'super_admin')) {
+      if (user && (user.role === 'admin' || user.role === 'super_admin')) {
         localStorage.setItem('adminToken', response.token);
-        setUser(response.user);
+        setUser(user);
       } else {
         throw new Error('Access denied. Admin privileges required.');
       }

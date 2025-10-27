@@ -78,12 +78,30 @@ export interface Event {
   updatedAt: string;
 }
 
+export interface Program {
+  _id?: string;
+  name: string;
+  level: string;
+  duration: string;
+  language: string;
+}
+
 export interface Formation {
   _id: string;
-  title: string;
+  name: string;
+  shortName: string;
+  type: 'public' | 'private';
+  location: {
+    city: string;
+    district: string;
+    address: string;
+  };
   description: string;
-  duration: string;
-  level: string;
+  image: string;
+  website: string;
+  phone: string;
+  email: string;
+  programs: Program[];
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -117,7 +135,7 @@ export const authAPI = {
   
   getMe: async () => {
     const response = await api.get('/auth/me');
-    return response.data;
+    return response.data.data || response.data;
   },
 };
 
@@ -126,23 +144,23 @@ export const adminAPI = {
   // Dashboard
   getStats: async (): Promise<DashboardStats> => {
     const response = await api.get('/admin/stats');
-    return response.data;
+    return response.data.data || response.data;
   },
 
   // Users
   getUsers: async (): Promise<User[]> => {
     const response = await api.get('/admin/users');
-    return response.data;
+    return response.data.data || response.data;
   },
 
   createUser: async (userData: Partial<User>): Promise<User> => {
     const response = await api.post('/admin/users', userData);
-    return response.data;
+    return response.data.data || response.data;
   },
 
   updateUser: async (id: string, userData: Partial<User>): Promise<User> => {
     const response = await api.put(`/admin/users/${id}`, userData);
-    return response.data;
+    return response.data.data || response.data;
   },
 
   deleteUser: async (id: string): Promise<void> => {
@@ -152,17 +170,17 @@ export const adminAPI = {
   // Events
   getEvents: async (): Promise<Event[]> => {
     const response = await api.get('/admin/events');
-    return response.data;
+    return response.data.data || response.data;
   },
 
   createEvent: async (eventData: Partial<Event>): Promise<Event> => {
     const response = await api.post('/admin/events', eventData);
-    return response.data;
+    return response.data.data || response.data;
   },
 
   updateEvent: async (id: string, eventData: Partial<Event>): Promise<Event> => {
     const response = await api.put(`/admin/events/${id}`, eventData);
-    return response.data;
+    return response.data.data || response.data;
   },
 
   deleteEvent: async (id: string): Promise<void> => {
@@ -172,37 +190,53 @@ export const adminAPI = {
   // Formations
   getFormations: async (): Promise<Formation[]> => {
     const response = await api.get('/admin/formations');
-    return response.data;
+    return response.data.data || response.data;
   },
 
   createFormation: async (formationData: Partial<Formation>): Promise<Formation> => {
     const response = await api.post('/admin/formations', formationData);
-    return response.data;
+    return response.data.data || response.data;
   },
 
   updateFormation: async (id: string, formationData: Partial<Formation>): Promise<Formation> => {
     const response = await api.put(`/admin/formations/${id}`, formationData);
-    return response.data;
+    return response.data.data || response.data;
   },
 
   deleteFormation: async (id: string): Promise<void> => {
     await api.delete(`/admin/formations/${id}`);
   },
 
+  // Program Management
+  addProgram: async (formationId: string, programData: Partial<Program>): Promise<Formation> => {
+    const response = await api.post(`/admin/formations/${formationId}/programs`, programData);
+    return response.data.data || response.data;
+  },
+
+  updateProgram: async (formationId: string, programId: string, programData: Partial<Program>): Promise<Formation> => {
+    const response = await api.put(`/admin/formations/${formationId}/programs/${programId}`, programData);
+    return response.data.data || response.data;
+  },
+
+  deleteProgram: async (formationId: string, programId: string): Promise<Formation> => {
+    const response = await api.delete(`/admin/formations/${formationId}/programs/${programId}`);
+    return response.data.data || response.data;
+  },
+
   // Services
   getServices: async (): Promise<Service[]> => {
     const response = await api.get('/admin/services');
-    return response.data;
+    return response.data.data || response.data;
   },
 
   createService: async (serviceData: Partial<Service>): Promise<Service> => {
     const response = await api.post('/admin/services', serviceData);
-    return response.data;
+    return response.data.data || response.data;
   },
 
   updateService: async (id: string, serviceData: Partial<Service>): Promise<Service> => {
     const response = await api.put(`/admin/services/${id}`, serviceData);
-    return response.data;
+    return response.data.data || response.data;
   },
 
   deleteService: async (id: string): Promise<void> => {
