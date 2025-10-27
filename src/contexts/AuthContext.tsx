@@ -33,7 +33,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
           const response = await authAPI.getMe();
           const user = response.user || response;
-          if (user && (user.role === 'admin' || user.role === 'super_admin')) {
+          // Allow any authenticated user (admin or regular user)
+          if (user) {
             setUser(user);
           } else {
             localStorage.removeItem('adminToken');
@@ -53,11 +54,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const response = await authAPI.login(phoneNumber, password);
       const user = response.user || response;
       
-      if (user && (user.role === 'admin' || user.role === 'super_admin')) {
+      // Allow any authenticated user (admin or regular user)
+      if (user) {
         localStorage.setItem('adminToken', response.token);
         setUser(user);
       } else {
-        throw new Error('Access denied. Admin privileges required.');
+        throw new Error('Failed to authenticate user.');
       }
     } catch (error) {
       throw error;

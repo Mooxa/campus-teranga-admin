@@ -5,20 +5,25 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function HomePage() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
     if (!isLoading) {
-      if (isAuthenticated) {
-        // User is authenticated, redirect to dashboard
-        router.replace('/dashboard');
+      if (isAuthenticated && user) {
+        // Redirect based on user role
+        if (user.role === 'admin' || user.role === 'super_admin') {
+          router.replace('/dashboard');
+        } else {
+          // Regular users stay on landing or can browse formations/events/services
+          router.replace('/landing');
+        }
       } else {
         // User is not authenticated, redirect to landing page
         router.replace('/landing');
       }
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [isAuthenticated, isLoading, user, router]);
 
   // Show loading spinner while checking authentication
   if (isLoading) {
