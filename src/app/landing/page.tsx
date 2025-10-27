@@ -213,6 +213,12 @@ export default function LandingPage() {
 
             <div className="flex items-center space-x-4">
               <Link
+                href="/register"
+                className="text-orange-600 hover:text-orange-700 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-orange-50 border border-orange-200"
+              >
+                Inscription
+              </Link>
+              <Link
                 href="/login"
                 className="text-gray-600 hover:text-orange-600 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-orange-50"
               >
@@ -244,6 +250,20 @@ export default function LandingPage() {
               <a href="#about" className="block text-gray-600 hover:text-orange-600 transition-colors font-medium">À Propos</a>
               <a href="#testimonials" className="block text-gray-600 hover:text-orange-600 transition-colors font-medium">Témoignages</a>
               <a href="#contact" className="block text-gray-600 hover:text-orange-600 transition-colors font-medium">Contact</a>
+              <div className="pt-4 border-t border-gray-200 space-y-3">
+                <Link
+                  href="/register"
+                  className="block w-full text-center text-orange-600 hover:text-orange-700 px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:bg-orange-50 border border-orange-200"
+                >
+                  Inscription
+                </Link>
+                <Link
+                  href="/login"
+                  className="block w-full text-center text-gray-600 hover:text-orange-600 px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:bg-orange-50"
+                >
+                  Connexion
+                </Link>
+              </div>
             </div>
           </div>
         )}
