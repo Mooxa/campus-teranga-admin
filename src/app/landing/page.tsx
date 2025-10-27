@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 import { 
   AcademicCapIcon,
   CalendarIcon,
@@ -22,10 +24,13 @@ import {
   ShieldCheckIcon,
   ChatBubbleLeftRightIcon,
   XMarkIcon,
-  Bars3Icon
+  Bars3Icon,
+  UserCircleIcon
 } from '@heroicons/react/24/outline';
 
 export default function LandingPage() {
+  const { user, isAuthenticated, logout } = useAuth();
+  const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [animatedStats, setAnimatedStats] = useState({
@@ -212,24 +217,46 @@ export default function LandingPage() {
             </div>
 
             <div className="flex items-center space-x-4">
-              <Link
-                href="/register"
-                className="text-orange-600 hover:text-orange-700 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-orange-50 border border-orange-200"
-              >
-                Inscription
-              </Link>
-              <Link
-                href="/login"
-                className="text-gray-600 hover:text-orange-600 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-orange-50"
-              >
-                Connexion
-              </Link>
-              <Link
-                href="/login"
-                className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-6 py-2 rounded-lg text-sm font-semibold hover:from-orange-600 hover:to-orange-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-              >
-                Admin Dashboard
-              </Link>
+              {isAuthenticated && user ? (
+                <>
+                  {/* Display user name and profile button for authenticated users */}
+                  <span className="text-sm font-medium text-gray-700 hidden sm:block">
+                    {user.fullName}
+                  </span>
+                  <button
+                    onClick={() => {
+                      // Redirect based on user role
+                      if (user.role === 'admin' || user.role === 'super_admin') {
+                        router.push('/dashboard');
+                      } else {
+                        router.push('/formations'); // Regular users see formations/events/services
+                      }
+                    }}
+                    className="flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-orange-50 border border-orange-200"
+                  >
+                    <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center text-white font-semibold">
+                      {user.fullName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
+                    </div>
+                    <span className="text-orange-600">Profil</span>
+                  </button>
+                </>
+              ) : (
+                <>
+                  {/* Show registration and login buttons for non-authenticated users */}
+                  <Link
+                    href="/register"
+                    className="text-orange-600 hover:text-orange-700 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-orange-50 border border-orange-200"
+                  >
+                    Inscription
+                  </Link>
+                  <Link
+                    href="/login"
+                    className="text-gray-600 hover:text-orange-600 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-orange-50"
+                  >
+                    Connexion
+                  </Link>
+                </>
+              )}
               
               {/* Mobile Menu Button */}
               <button
@@ -251,18 +278,46 @@ export default function LandingPage() {
               <a href="#testimonials" className="block text-gray-600 hover:text-orange-600 transition-colors font-medium">Témoignages</a>
               <a href="#contact" className="block text-gray-600 hover:text-orange-600 transition-colors font-medium">Contact</a>
               <div className="pt-4 border-t border-gray-200 space-y-3">
-                <Link
-                  href="/register"
-                  className="block w-full text-center text-orange-600 hover:text-orange-700 px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:bg-orange-50 border border-orange-200"
-                >
-                  Inscription
-                </Link>
-                <Link
-                  href="/login"
-                  className="block w-full text-center text-gray-600 hover:text-orange-600 px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:bg-orange-50"
-                >
-                  Connexion
-                </Link>
+                {isAuthenticated && user ? (
+                  <div className="space-y-3">
+                    <div className="flex items-center space-x-3 p-3 bg-orange-50 rounded-lg border border-orange-200">
+                      <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                        {user.fullName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900">{user.fullName}</p>
+                        <p className="text-xs text-gray-500">{user.role}</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => {
+                        if (user.role === 'admin' || user.role === 'super_admin') {
+                          router.push('/dashboard');
+                        } else {
+                          router.push('/formations');
+                        }
+                      }}
+                      className="block w-full text-center text-orange-600 hover:text-orange-700 px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:bg-orange-50 border border-orange-200"
+                    >
+                      Accéder au Dashboard
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <Link
+                      href="/register"
+                      className="block w-full text-center text-orange-600 hover:text-orange-700 px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:bg-orange-50 border border-orange-200"
+                    >
+                      Inscription
+                    </Link>
+                    <Link
+                      href="/login"
+                      className="block w-full text-center text-gray-600 hover:text-orange-600 px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:bg-orange-50"
+                    >
+                      Connexion
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </div>
