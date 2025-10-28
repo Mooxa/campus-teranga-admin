@@ -471,9 +471,34 @@ export default function LandingPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((feature, index) => (
-              <div 
+              <button
                 key={index} 
-                className="group relative p-8 rounded-3xl bg-white/80 backdrop-blur-sm border border-gray-200/50 hover:shadow-2xl hover:shadow-orange-200/50 transition-all duration-500 transform hover:-translate-y-3 hover:scale-105"
+                onClick={() => {
+                  if (!isAuthenticated) {
+                    router.push('/login');
+                    return;
+                  }
+                  
+                  // Navigate based on feature type
+                  switch(feature.title) {
+                    case 'Formations Éducatives':
+                      router.push('/home?tab=formations');
+                      break;
+                    case 'Événements Étudiants':
+                      router.push('/home?tab=events');
+                      break;
+                    case 'Services Étudiants':
+                      router.push('/home?tab=services');
+                      break;
+                    case 'Communauté':
+                      // Could navigate to a community page later
+                      router.push('/home');
+                      break;
+                    default:
+                      router.push('/home');
+                  }
+                }}
+                className="group relative p-8 rounded-3xl bg-white/80 backdrop-blur-sm border border-gray-200/50 hover:shadow-2xl hover:shadow-orange-200/50 transition-all duration-500 transform hover:-translate-y-3 hover:scale-105 cursor-pointer w-full text-left"
                 style={{ animationDelay: feature.delay }}
               >
                 {/* Background Gradient */}
@@ -498,7 +523,7 @@ export default function LandingPage() {
                     <ArrowRightIcon className="w-6 h-6 text-white group-hover:translate-x-2 transition-transform duration-300" />
                   </div>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         </div>

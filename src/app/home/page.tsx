@@ -33,6 +33,15 @@ export default function HomePage() {
   });
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'formations' | 'events' | 'services'>('formations');
+
+  // Handle URL query parameter for initial tab
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tab = urlParams.get('tab');
+    if (tab === 'events' || tab === 'services') {
+      setActiveTab(tab);
+    }
+  }, []);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredContent, setFilteredContent] = useState<any[]>([]);
   const [selectedFormation, setSelectedFormation] = useState<Formation | null>(null);
