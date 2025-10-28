@@ -13,7 +13,11 @@ import {
   ClockIcon,
   UsersIcon,
   GlobeAltIcon,
-  ArrowLeftIcon
+  ArrowLeftIcon,
+  UserIcon,
+  UserCircleIcon,
+  ArrowRightOnRectangleIcon,
+  ChevronDownIcon
 } from '@heroicons/react/24/outline';
 import { Formation, Event, Service, publicAPI } from '@/lib/api';
 
@@ -24,7 +28,7 @@ interface PublicContent {
 }
 
 export default function HomePage() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const router = useRouter();
   const [content, setContent] = useState<PublicContent>({
     formations: [],
@@ -33,15 +37,6 @@ export default function HomePage() {
   });
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'formations' | 'events' | 'services'>('formations');
-
-  // Handle URL query parameter for initial tab
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const tab = urlParams.get('tab');
-    if (tab === 'events' || tab === 'services') {
-      setActiveTab(tab);
-    }
-  }, []);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredContent, setFilteredContent] = useState<any[]>([]);
   const [selectedFormation, setSelectedFormation] = useState<Formation | null>(null);
@@ -49,9 +44,25 @@ export default function HomePage() {
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState<'formation' | 'event' | 'service'>('formation');
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const profileDropdownRef = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchContent();
+  }, []);
+
+  // Close profile dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target as Node)) {
+        setIsProfileDropdownOpen(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, []);
 
   useEffect(() => {
@@ -152,13 +163,74 @@ export default function HomePage() {
             
             <div className="flex items-center space-x-4">
               {user && (
-                <div className="flex items-center space-x-3">
-                  <span className="text-sm font-medium text-gray-700 hidden sm:block">
-                    Bonjour, {user.fullName}
-                  </span>
-                  <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                    {user.fullName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
-                  </div>
+                <div className="relative" ref={profileDropdownRef}>
+                  <button
+                    onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+                    className="flex items-center space-x-3 hover:bg-orange-50 rounded-lg px-3 py-2 transition-all duration-200"
+                  >
+                    <span className="text-sm font-medium text-gray-700 hidden sm:block">
+                      Bonjour, {user.fullName}
+                    </span>
+                    <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                      {user.fullName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
+                    </div>
+                    <ChevronDownIcon className={`w-4 h-4 text-gray-600 transition-transform duration-200 ${isProfileDropdownOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  {isProfileDropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
+                      <div className="px-4 py-3 border-b border-gray-100">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center">
+                            <span className="text-white font-semibold">
+                              {user.fullName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
+                            </span>
+                          </div>
+                          <div>
+                            <div className="font-medium text-gray-900">{user.fullName}</div>
+                            <div className="text-sm text-gray-500">{user.email}</div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="py-2">
+                        <button
+                          onClick={() => {
+                            setIsProfileDropdownOpen(false);
+                            router.push('/profile/edit');
+                          }}
+                          className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
+                        >
+                          <UserIcon className="w-5 h-5 mr-3 text-gray-400" />
+                          <span>Modifier le profil</span>
+                        </button>
+                        
+                        <button
+                          onClick={() => {
+                            if (user.role === 'admin' || user.role === 'super_admin') {
+                              router.push('/dashboard');
+                            }
+                          }}
+                          className={`flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200 ${(!user.role || user.role === 'user') ? 'hidden' : ''}`}
+                        >
+                          <UserCircleIcon className="w-5 h-5 mr-3 text-gray-400" />
+                          <span>Tableau de bord</span>
+                        </button>
+                        
+                        <button
+                          onClick={() => {
+                            setIsProfileDropdownOpen(false);
+                            logout();
+                          }}
+                          className="flex items-center w-full px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors duration-200"
+                        >
+                          <ArrowRightOnRectangleIcon className="w-5 h-5 mr-3 text-red-400" />
+                          <span>Se déconnecter</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

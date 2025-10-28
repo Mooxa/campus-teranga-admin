@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 
 export default function LoginPage() {
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -57,7 +58,16 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-neutral-50 to-neutral-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+      <div className="max-w-md w-full space-y-8 relative">
+        {/* Back Button */}
+        <button
+          onClick={() => router.push('/landing')}
+          className="absolute -top-12 left-0 flex items-center space-x-2 text-neutral-600 hover:text-neutral-900 transition-colors duration-200"
+        >
+          <ArrowLeftIcon className="h-5 w-5" />
+          <span className="font-medium">Retour à l'accueil</span>
+        </button>
+
         {/* Logo and Header */}
         <div className="text-center">
           <div className="mx-auto h-16 w-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg">
