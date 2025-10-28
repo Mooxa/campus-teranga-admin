@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { 
   AcademicCapIcon,
   CalendarIcon,
@@ -10,7 +12,8 @@ import {
   MagnifyingGlassIcon,
   ClockIcon,
   UsersIcon,
-  GlobeAltIcon
+  GlobeAltIcon,
+  ArrowLeftIcon
 } from '@heroicons/react/24/outline';
 import { Formation, Event, Service, publicAPI } from '@/lib/api';
 
@@ -22,6 +25,7 @@ interface PublicContent {
 
 export default function HomePage() {
   const { user } = useAuth();
+  const router = useRouter();
   const [content, setContent] = useState<PublicContent>({
     formations: [],
     events: [],
@@ -117,13 +121,24 @@ export default function HomePage() {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-200/50 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg">
-                <span className="text-white font-bold text-lg">CT</span>
+            <div className="flex items-center space-x-4">
+              {/* Back Button */}
+              <button
+                onClick={() => router.push('/landing')}
+                className="flex items-center space-x-2 px-4 py-2 rounded-xl text-neutral-600 hover:text-orange-600 hover:bg-orange-50 transition-all duration-200 font-medium"
+              >
+                <ArrowLeftIcon className="h-5 w-5" />
+                <span className="hidden sm:inline">Retour</span>
+              </button>
+              
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg">
+                  <span className="text-white font-bold text-lg">CT</span>
+                </div>
+                <span className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-blue-600 bg-clip-text text-transparent">
+                  Campus Téranga
+                </span>
               </div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-blue-600 bg-clip-text text-transparent">
-                Campus Téranga
-              </span>
             </div>
             
             <div className="flex items-center space-x-4">
