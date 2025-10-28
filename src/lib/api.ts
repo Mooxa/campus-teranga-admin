@@ -255,4 +255,43 @@ export const adminAPI = {
   },
 };
 
+// Public API - no authentication required
+export const publicAPI = {
+  // Get all active formations
+  getFormations: async (): Promise<Formation[]> => {
+    const response = await api.get('/formations');
+    return response.data.data || response.data;
+  },
+
+  // Get formation by ID
+  getFormation: async (id: string): Promise<Formation> => {
+    const response = await api.get(`/formations/${id}`);
+    return response.data.data || response.data;
+  },
+
+  // Get all active events
+  getEvents: async (): Promise<Event[]> => {
+    const response = await api.get('/events');
+    return response.data.data || response.data;
+  },
+
+  // Get event by ID
+  getEvent: async (id: string): Promise<Event> => {
+    const response = await api.get(`/events/${id}`);
+    return response.data.data || response.data;
+  },
+
+  // Get all active services
+  getServices: async (): Promise<Service[]> => {
+    const response = await api.get('/services');
+    return response.data.data || response.data;
+  },
+
+  // Get service by ID
+  getService: async (id: string): Promise<Service> => {
+    const response = await api.get(`/services/${id}`);
+    return response.data.data || response.data;
+  },
+};
+
 export default api;

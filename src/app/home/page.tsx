@@ -2,22 +2,16 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import Link from 'next/link';
 import { 
   AcademicCapIcon,
   CalendarIcon,
   CogIcon,
   MapPinIcon,
-  PhoneIcon,
-  EnvelopeIcon,
-  GlobeAltIcon,
   MagnifyingGlassIcon,
-  FunnelIcon,
-  HeartIcon,
   ClockIcon,
   UsersIcon
 } from '@heroicons/react/24/outline';
-import { Formation, Event, Service } from '@/lib/api';
+import { Formation, Event, Service, publicAPI } from '@/lib/api';
 
 interface PublicContent {
   formations: Formation[];
@@ -77,22 +71,16 @@ export default function HomePage() {
 
   const fetchContent = async () => {
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-      
-      const [formationsRes, eventsRes, servicesRes] = await Promise.all([
-        fetch(`${apiUrl}/api/formations?isActive=true`),
-        fetch(`${apiUrl}/api/events?isActive=true`),
-        fetch(`${apiUrl}/api/services?isActive=true`)
+      const [formations, events, services] = await Promise.all([
+        publicAPI.getFormations(),
+        publicAPI.getEvents(),
+        publicAPI.getServices()
       ]);
 
-      const formationsJson = await formationsRes.json();
-      const eventsJson = await eventsRes.json();
-      const servicesJson = await servicesRes.json();
-
       setContent({
-        formations: Array.isArray(formationsJson.data) ? formationsJson.data : (Array.isArray(formationsJson) ? formationsJson : []),
-        events: Array.isArray(eventsJson.data) ? eventsJson.data : (Array.isArray(eventsJson) ? eventsJson : []),
-        services: Array.isArray(servicesJson.data) ? servicesJson.data : (Array.isArray(servicesJson) ? servicesJson : [])
+        formations: Array.isArray(formations) ? formations : [],
+        events: Array.isArray(events) ? events : [],
+        services: Array.isArray(services) ? services : []
       });
     } catch (error) {
       console.error('Failed to fetch content:', error);
