@@ -17,14 +17,17 @@ import {
   UserIcon,
   UserCircleIcon,
   ArrowRightOnRectangleIcon,
-  ChevronDownIcon
+  ChevronDownIcon,
+  UserGroupIcon,
+  ChatBubbleLeftRightIcon
 } from '@heroicons/react/24/outline';
-import { Formation, Event, Service, publicAPI } from '@/lib/api';
+import { Formation, Event, Service, publicAPI, communityAPI, Community } from '@/lib/api';
 
 interface PublicContent {
   formations: Formation[];
   events: Event[];
   services: Service[];
+  communities: Community[];
 }
 
 export default function HomePage() {
@@ -33,10 +36,11 @@ export default function HomePage() {
   const [content, setContent] = useState<PublicContent>({
     formations: [],
     events: [],
-    services: []
+    services: [],
+    communities: []
   });
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'formations' | 'events' | 'services'>('formations');
+  const [activeTab, setActiveTab] = useState<'formations' | 'events' | 'services' | 'communities'>('formations');
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredContent, setFilteredContent] = useState<any[]>([]);
   const [selectedFormation, setSelectedFormation] = useState<Formation | null>(null);
@@ -78,6 +82,9 @@ export default function HomePage() {
       case 'services':
         items = content.services;
         break;
+      case 'communities':
+        items = content.communities;
+        break;
     }
     
     if (searchQuery) {
@@ -88,6 +95,9 @@ export default function HomePage() {
                  item.description?.toLowerCase().includes(searchQuery.toLowerCase());
         } else if (activeTab === 'events') {
           return item.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                 item.description?.toLowerCase().includes(searchQuery.toLowerCase());
+        } else if (activeTab === 'communities') {
+          return item.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
                  item.description?.toLowerCase().includes(searchQuery.toLowerCase());
         } else {
           return item.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -101,16 +111,18 @@ export default function HomePage() {
 
   const fetchContent = async () => {
     try {
-      const [formations, events, services] = await Promise.all([
+      const [formations, events, services, communities] = await Promise.all([
         publicAPI.getFormations(),
         publicAPI.getEvents(),
-        publicAPI.getServices()
+        publicAPI.getServices(),
+        communityAPI.getCommunities()
       ]);
 
       setContent({
         formations: Array.isArray(formations) ? formations : [],
         events: Array.isArray(events) ? events : [],
-        services: Array.isArray(services) ? services : []
+        services: Array.isArray(services) ? services : [],
+        communities: Array.isArray(communities) ? communities : []
       });
     } catch (error) {
       console.error('Failed to fetch content:', error);
@@ -294,12 +306,23 @@ export default function HomePage() {
                 onClick={() => setActiveTab('services')}
                 className={`px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
                   activeTab === 'services'
-                    ? 'bg-orange-500 text-white shadow-md'
-                    : 'text-neutral-600 hover:text-orange-600'
+                    ? 'bg-green-500 text-white shadow-md'
+                    : 'text-neutral-600 hover:text-green-600'
                 }`}
               >
                 <CogIcon className="h-5 w-5 inline-block mr-2" />
                 Services
+              </button>
+              <button
+                onClick={() => setActiveTab('communities')}
+                className={`px-6 py-3 rounded-xl font-medium transition-all duration-200 ${
+                  activeTab === 'communities'
+                    ? 'bg-purple-500 text-white shadow-md'
+                    : 'text-neutral-600 hover:text-purple-600'
+                }`}
+              >
+                <UserGroupIcon className="h-5 w-5 inline-block mr-2" />
+                Communautés
               </button>
             </div>
           </div>
@@ -403,6 +426,28 @@ export default function HomePage() {
                       Voir les détails
                     </button>
                   )}
+
+                  {activeTab === 'communities' && (
+                    <>
+                      <div className="space-y-2 text-sm text-neutral-500 mb-4">
+                        <div className="flex items-center">
+                          <UserGroupIcon className="h-4 w-4 mr-2" />
+                          {item.members?.length || 0} membre(s)
+                        </div>
+                        <div className="flex items-center">
+                          <ChatBubbleLeftRightIcon className="h-4 w-4 mr-2" />
+                          {item.posts?.length || 0} publication(s)
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => router.push(`/communities`)}
+                        className="w-full mt-4 bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-4 rounded-xl transition-all duration-200 flex items-center justify-center"
+                      >
+                        <UserGroupIcon className="h-5 w-5 mr-2" />
+                        Rejoindre la communauté
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             ))}
@@ -414,6 +459,7 @@ export default function HomePage() {
                 {activeTab === 'formations' && <AcademicCapIcon className="h-12 w-12 text-orange-600" />}
                 {activeTab === 'events' && <CalendarIcon className="h-12 w-12 text-orange-600" />}
                 {activeTab === 'services' && <CogIcon className="h-12 w-12 text-orange-600" />}
+                {activeTab === 'communities' && <UserGroupIcon className="h-12 w-12 text-purple-600" />}
               </div>
               <h3 className="text-xl font-semibold text-neutral-900 mb-2">
                 {searchQuery ? 'Aucun résultat trouvé' : 'Aucun contenu disponible'}
