@@ -294,4 +294,71 @@ export const publicAPI = {
   },
 };
 
+// Community API
+export interface CommunityPost {
+  _id?: string;
+  author: User;
+  content: string;
+  image: string;
+  likes: string[];
+  comments: Array<{
+    author: User;
+    content: string;
+    createdAt: string;
+  }>;
+  createdAt: string;
+}
+
+export interface CommunityMember {
+  user: User;
+  joinedAt: string;
+  role: 'owner' | 'admin' | 'member';
+}
+
+export interface Community {
+  _id: string;
+  name: string;
+  description: string;
+  image: string;
+  category: 'academic' | 'social' | 'professional' | 'cultural' | 'sports' | 'other';
+  creator: User;
+  members: CommunityMember[];
+  posts: CommunityPost[];
+  isPublic: boolean;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export const communityAPI = {
+  // Get all communities
+  getCommunities: async (): Promise<Community[]> => {
+    const response = await api.get('/communities');
+    return response.data.data || response.data;
+  },
+
+  // Get community by ID
+  getCommunity: async (id: string): Promise<Community> => {
+    const response = await api.get(`/communities/${id}`);
+    return response.data.data || response.data;
+  },
+
+  // Create community
+  createCommunity: async (communityData: Partial<Community>): Promise<Community> => {
+    const response = await api.post('/communities', communityData);
+    return response.data.data || response.data;
+  },
+
+  // Join community
+  joinCommunity: async (id: string): Promise<void> => {
+    await api.post(`/communities/${id}/join`);
+  },
+
+  // Create post in community
+  createPost: async (communityId: string, postData: { content: string; image?: string }): Promise<CommunityPost> => {
+    const response = await api.post(`/communities/${communityId}/posts`, postData);
+    return response.data.data || response.data;
+  },
+};
+
 export default api;
