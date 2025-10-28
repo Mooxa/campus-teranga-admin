@@ -9,7 +9,8 @@ import {
   MapPinIcon,
   MagnifyingGlassIcon,
   ClockIcon,
-  UsersIcon
+  UsersIcon,
+  GlobeAltIcon
 } from '@heroicons/react/24/outline';
 import { Formation, Event, Service, publicAPI } from '@/lib/api';
 
@@ -30,6 +31,8 @@ export default function HomePage() {
   const [activeTab, setActiveTab] = useState<'formations' | 'events' | 'services'>('formations');
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredContent, setFilteredContent] = useState<any[]>([]);
+  const [selectedFormation, setSelectedFormation] = useState<Formation | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     fetchContent();
@@ -223,20 +226,32 @@ export default function HomePage() {
                   </p>
                   
                   {activeTab === 'formations' && (
-                    <div className="space-y-2 text-sm text-neutral-500">
-                      {item.programs?.length > 0 && (
-                        <div className="flex items-center">
-                          <AcademicCapIcon className="h-4 w-4 mr-2" />
-                          {item.programs.length} programme(s) disponible(s)
-                        </div>
-                      )}
-                      {item.location && (
-                        <div className="flex items-center">
-                          <MapPinIcon className="h-4 w-4 mr-2" />
-                          {item.location.city}, {item.location.district}
-                        </div>
-                      )}
-                    </div>
+                    <>
+                      <div className="space-y-2 text-sm text-neutral-500 mb-4">
+                        {item.programs?.length > 0 && (
+                          <div className="flex items-center">
+                            <AcademicCapIcon className="h-4 w-4 mr-2" />
+                            {item.programs.length} programme(s) disponible(s)
+                          </div>
+                        )}
+                        {item.location && (
+                          <div className="flex items-center">
+                            <MapPinIcon className="h-4 w-4 mr-2" />
+                            {item.location.city}, {item.location.district}
+                          </div>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => {
+                          setSelectedFormation(item);
+                          setIsModalOpen(true);
+                        }}
+                        className="w-full mt-4 bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-xl transition-all duration-200 flex items-center justify-center"
+                      >
+                        <AcademicCapIcon className="h-5 w-5 mr-2" />
+                        Voir les programmes
+                      </button>
+                    </>
                   )}
                   
                   {activeTab === 'events' && (
@@ -283,6 +298,114 @@ export default function HomePage() {
           )}
         </div>
       </div>
+
+      {/* Formation Detail Modal */}
+      {isModalOpen && selectedFormation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+            {/* Modal Header */}
+            <div className="bg-gradient-to-r from-orange-500 to-orange-600 p-6 text-white">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h2 className="text-2xl font-bold mb-2">{selectedFormation.name}</h2>
+                  {selectedFormation.shortName && (
+                    <p className="text-orange-100">{selectedFormation.shortName}</p>
+                  )}
+                </div>
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="text-white hover:text-gray-200 transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
+              {/* Formation Info */}
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold text-neutral-900 mb-3">Description</h3>
+                <p className="text-neutral-600 mb-4">{selectedFormation.description}</p>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {selectedFormation.location && (
+                    <div className="bg-neutral-50 p-4 rounded-xl">
+                      <div className="flex items-center mb-2">
+                        <MapPinIcon className="h-5 w-5 text-orange-600 mr-2" />
+                        <span className="font-semibold text-neutral-900">Localisation</span>
+                      </div>
+                      <p className="text-neutral-600">{selectedFormation.location.address}</p>
+                      <p className="text-neutral-600">{selectedFormation.location.district}, {selectedFormation.location.city}</p>
+                    </div>
+                  )}
+                  
+                  <div className="bg-neutral-50 p-4 rounded-xl">
+                    <div className="flex items-center mb-2">
+                      <AcademicCapIcon className="h-5 w-5 text-orange-600 mr-2" />
+                      <span className="font-semibold text-neutral-900">Type</span>
+                    </div>
+                    <p className="text-neutral-600 capitalize">{selectedFormation.type}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Programs Section */}
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold text-neutral-900 mb-4">
+                  Programmes ({selectedFormation.programs?.length || 0})
+                </h3>
+                
+                {selectedFormation.programs && selectedFormation.programs.length > 0 ? (
+                  <div className="space-y-4">
+                    {selectedFormation.programs.map((program, index) => (
+                      <div key={index} className="bg-gradient-to-br from-orange-50 to-orange-100 p-5 rounded-xl border border-orange-200">
+                        <div className="flex items-start justify-between mb-3">
+                          <h4 className="text-xl font-bold text-neutral-900">{program.name}</h4>
+                          <span className="bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                            {program.level}
+                          </span>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="flex items-center text-neutral-600">
+                            <ClockIcon className="h-5 w-5 text-orange-600 mr-2" />
+                            <span className="font-medium">Durée:</span>
+                            <span className="ml-2">{program.duration}</span>
+                          </div>
+                          
+                          <div className="flex items-center text-neutral-600">
+                            <GlobeAltIcon className="h-5 w-5 text-orange-600 mr-2" />
+                            <span className="font-medium">Langue:</span>
+                            <span className="ml-2">{program.language}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="bg-neutral-50 p-8 rounded-xl text-center">
+                    <AcademicCapIcon className="h-12 w-12 text-neutral-400 mx-auto mb-3" />
+                    <p className="text-neutral-600">Aucun programme disponible pour cette formation</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="bg-neutral-50 px-6 py-4 border-t border-neutral-200 flex justify-end">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="px-6 py-2 bg-orange-500 text-white font-semibold rounded-xl hover:bg-orange-600 transition-colors"
+              >
+                Fermer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
