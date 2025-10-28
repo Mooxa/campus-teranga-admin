@@ -148,6 +148,11 @@ export const authAPI = {
     const response = await api.get('/auth/me');
     return response.data.data || response.data;
   },
+  
+  updateProfile: async (userData: Partial<User>) => {
+    const response = await api.put('/users/profile', userData);
+    return response.data.data || response.data;
+  },
 };
 
 // Admin API

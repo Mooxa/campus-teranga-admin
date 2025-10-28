@@ -878,7 +878,7 @@ export default function LandingPage() {
                 <PhoneIcon className="h-10 w-10 text-white" />
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-4">Téléphone</h3>
-              <p className="text-gray-800 text-lg font-medium">+221 33 123 45 67</p>
+              <p className="text-gray-800 text-lg font-medium">+221 77 107 51 58</p>
               <p className="text-sm text-gray-600 mt-2">Disponible 24/7</p>
             </div>
 
