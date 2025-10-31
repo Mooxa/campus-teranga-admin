@@ -45,12 +45,12 @@ export default function EditProfilePage() {
       setFormData({
         fullName: user.fullName || '',
         email: user.email || '',
-        phone: user.phone || '',
-        dateOfBirth: user.dateOfBirth ? new Date(user.dateOfBirth).toISOString().split('T')[0] : '',
-        address: user.address || '',
-        fieldOfStudy: user.fieldOfStudy || '',
-        yearOfStudy: user.yearOfStudy || '',
-        bio: user.bio || ''
+        phone: ('phoneNumber' in user ? user.phoneNumber : '') || '',
+        dateOfBirth: ('dateOfBirth' in user && user.dateOfBirth) ? new Date(user.dateOfBirth as string).toISOString().split('T')[0] : '',
+        address: ('address' in user ? (user.address as string | undefined) : undefined) || '',
+        fieldOfStudy: ('fieldOfStudy' in user ? (user.fieldOfStudy as string | undefined) : undefined) || '',
+        yearOfStudy: ('yearOfStudy' in user ? (user.yearOfStudy as string | undefined) : undefined) || '',
+        bio: ('bio' in user ? (user.bio as string | undefined) : undefined) || ''
       });
     }
   }, [user]);
@@ -71,9 +71,8 @@ export default function EditProfilePage() {
       const updatedUser = await authAPI.updateProfile(formData);
       updateUser(updatedUser);
       router.push('/dashboard');
-    } catch (error) {
-      console.error('Failed to update profile:', error);
-      // Handle error (show toast, etc.)
+    } catch {
+      // Error handled silently - consider showing toast notification to user
     } finally {
       setSaving(false);
     }

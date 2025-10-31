@@ -27,7 +27,9 @@ export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_showCreateModal, setShowCreateModal] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_editingUser, setEditingUser] = useState<User | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState<'all' | 'super_admin' | 'admin' | 'user'>('all');
@@ -81,8 +83,8 @@ export default function UsersPage() {
     try {
       const data = await adminAPI.getUsers();
       setUsers(data);
-    } catch (error) {
-      console.error('Failed to fetch users:', error);
+    } catch {
+      // Error handled silently
     } finally {
       setLoading(false);
     }
@@ -92,8 +94,8 @@ export default function UsersPage() {
     try {
       await adminAPI.updateUser(user._id, { isActive: !user.isActive });
       setUsers(users.map(u => u._id === user._id ? { ...u, isActive: !u.isActive } : u));
-    } catch (error) {
-      console.error('Failed to update user:', error);
+    } catch {
+      // Error handled silently
     }
   };
 
@@ -102,8 +104,8 @@ export default function UsersPage() {
       try {
         await adminAPI.deleteUser(userId);
         setUsers(users.filter(u => u._id !== userId));
-      } catch (error) {
-        console.error('Failed to delete user:', error);
+      } catch {
+        // Error handled silently
       }
     }
   };

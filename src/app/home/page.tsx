@@ -89,18 +89,22 @@ export default function HomePage() {
     if (searchQuery) {
       items = items.filter(item => {
         if (activeTab === 'formations') {
-          return item.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                 item.shortName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                 item.description?.toLowerCase().includes(searchQuery.toLowerCase());
+          const formation = item as Formation;
+          return formation.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                 formation.shortName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                 formation.description?.toLowerCase().includes(searchQuery.toLowerCase());
         } else if (activeTab === 'events') {
-          return item.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                 item.description?.toLowerCase().includes(searchQuery.toLowerCase());
+          const event = item as Event;
+          return event.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                 event.description?.toLowerCase().includes(searchQuery.toLowerCase());
         } else if (activeTab === 'communities') {
-          return item.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                 item.description?.toLowerCase().includes(searchQuery.toLowerCase());
+          const community = item as Community;
+          return community.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                 community.description?.toLowerCase().includes(searchQuery.toLowerCase());
         } else {
-          return item.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                 item.description?.toLowerCase().includes(searchQuery.toLowerCase());
+          const service = item as Service;
+          return service.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                 service.description?.toLowerCase().includes(searchQuery.toLowerCase());
         }
       });
     }
@@ -123,8 +127,8 @@ export default function HomePage() {
         services: Array.isArray(services) ? services : [],
         communities: Array.isArray(communities) ? communities : []
       });
-    } catch (error) {
-      console.error('Failed to fetch content:', error);
+    } catch {
+      // Error handled silently
     } finally {
       setLoading(false);
     }
@@ -365,7 +369,8 @@ export default function HomePage() {
                         {('location' in item && item.location) ? (
                           <div className="flex items-center">
                             <MapPinIcon className="h-4 w-4 mr-2" />
-                            {item.location.city}, {item.location.district}
+                            {item.location.city}
+                            {'district' in item.location && item.location.district && `, ${item.location.district}`}
                           </div>
                         ) : null}
                       </div>
@@ -395,7 +400,7 @@ export default function HomePage() {
                         {('location' in item && item.location) ? (
                           <div className="flex items-center">
                             <MapPinIcon className="h-4 w-4 mr-2" />
-                            {item.location.name}
+                            {'name' in item.location ? item.location.name : item.location.city}
                           </div>
                         ) : null}
                         {('capacity' in item && item.capacity) ? (

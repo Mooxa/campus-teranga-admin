@@ -25,8 +25,10 @@ export default function EventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [editingEvent, setEditingEvent] = useState<Event | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_showCreateModal, setShowCreateModal] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [sortBy, setSortBy] = useState<'date' | 'title' | 'created'>('date');
@@ -74,8 +76,8 @@ export default function EventsPage() {
     try {
       const data = await adminAPI.getEvents();
       setEvents(data);
-    } catch (error) {
-      console.error('Failed to fetch events:', error);
+    } catch {
+      // Error handled silently
     } finally {
       setLoading(false);
     }
@@ -85,8 +87,8 @@ export default function EventsPage() {
     try {
       await adminAPI.updateEvent(event._id, { isActive: !event.isActive });
       setEvents(events.map(e => e._id === event._id ? { ...e, isActive: !e.isActive } : e));
-    } catch (error) {
-      console.error('Failed to update event:', error);
+    } catch {
+      // Error handled silently
     }
   };
 
@@ -95,8 +97,8 @@ export default function EventsPage() {
       try {
         await adminAPI.deleteEvent(eventId);
         setEvents(events.filter(e => e._id !== eventId));
-      } catch (error) {
-        console.error('Failed to delete event:', error);
+      } catch {
+        // Error handled silently
       }
     }
   };

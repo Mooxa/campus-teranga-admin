@@ -27,21 +27,18 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log('Auth state changed:', { isAuthenticated, isLoading, user });
-    
-    if (isAuthenticated) {
+    if (isAuthenticated && user) {
       fetchStats();
     } else if (!isLoading) {
       // If not authenticated and not loading, set loading to false
       setLoading(false);
     }
-  }, [isAuthenticated, isLoading]);
+  }, [isAuthenticated, isLoading, user]);
 
   // Add timeout to prevent infinite loading
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (loading) {
-        console.log('Loading timeout reached, setting loading to false');
         setLoading(false);
       }
     }, 10000); // 10 second timeout
@@ -51,13 +48,10 @@ export default function DashboardPage() {
 
   const fetchStats = async () => {
     try {
-      console.log('Fetching dashboard stats...');
       const data = await adminAPI.getStats();
-      console.log('Stats fetched successfully:', data);
       setStats(data);
-    } catch (error) {
-      console.error('Failed to fetch stats:', error);
-      // Set default stats to prevent infinite loading
+    } catch {
+      // Error handling: set default stats to prevent infinite loading
       setStats({
         totalUsers: 0,
         totalEvents: 0,

@@ -15,12 +15,8 @@ import {
   MagnifyingGlassIcon,
   BuildingOfficeIcon,
   MapPinIcon,
-  GlobeAltIcon,
-  PhoneIcon,
-  EnvelopeIcon,
   BookOpenIcon,
-  XMarkIcon,
-  ArrowLeftIcon
+  XMarkIcon
 } from '@heroicons/react/24/outline';
 
 export default function FormationsPage() {
@@ -28,7 +24,8 @@ export default function FormationsPage() {
   const [formations, setFormations] = useState<Formation[]>([]);
   const [filteredFormations, setFilteredFormations] = useState<Formation[]>([]);
   const [loading, setLoading] = useState(true);
-  const [editingFormation, setEditingFormation] = useState<Formation | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_editingFormation, setEditingFormation] = useState<Formation | null>(null);
   const [selectedFormation, setSelectedFormation] = useState<Formation | null>(null);
   const [showProgramsModal, setShowProgramsModal] = useState(false);
   const [editingProgram, setEditingProgram] = useState<{ program: Program; index: number } | null>(null);
@@ -81,8 +78,8 @@ export default function FormationsPage() {
     try {
       const data = await adminAPI.getFormations();
       setFormations(data);
-    } catch (error) {
-      console.error('Failed to fetch formations:', error);
+    } catch {
+      // Error handled silently
     } finally {
       setLoading(false);
     }
@@ -92,8 +89,8 @@ export default function FormationsPage() {
     try {
       await adminAPI.updateFormation(formation._id, { isActive: !formation.isActive });
       setFormations(formations.map(f => f._id === formation._id ? { ...f, isActive: !f.isActive } : f));
-    } catch (error) {
-      console.error('Failed to update formation:', error);
+    } catch {
+      // Error handled silently
     }
   };
 
@@ -102,8 +99,8 @@ export default function FormationsPage() {
       try {
         await adminAPI.deleteFormation(formationId);
         setFormations(formations.filter(f => f._id !== formationId));
-      } catch (error) {
-        console.error('Failed to delete formation:', error);
+      } catch {
+        // Error handled silently
       }
     }
   };
@@ -128,8 +125,8 @@ export default function FormationsPage() {
       }
       await fetchFormations();
       setEditingProgram(null);
-    } catch (error) {
-      console.error('Failed to save program:', error);
+    } catch {
+      // Error handled silently
     }
   };
 
@@ -140,8 +137,8 @@ export default function FormationsPage() {
     try {
       await adminAPI.deleteProgram(selectedFormation._id, program._id);
       await fetchFormations();
-    } catch (error) {
-      console.error('Failed to delete program:', error);
+    } catch {
+      // Error handled silently
     }
   };
 

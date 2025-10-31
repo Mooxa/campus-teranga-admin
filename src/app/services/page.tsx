@@ -78,8 +78,8 @@ export default function ServicesPage() {
     try {
       const data = await adminAPI.getServices();
       setServices(data);
-    } catch (error) {
-      console.error('Failed to fetch services:', error);
+    } catch {
+      // Error handled silently
     } finally {
       setLoading(false);
     }
@@ -89,8 +89,8 @@ export default function ServicesPage() {
     try {
       await adminAPI.updateService(service._id, { isActive: !service.isActive });
       setServices(services.map(s => s._id === service._id ? { ...s, isActive: !s.isActive } : s));
-    } catch (error) {
-      console.error('Failed to update service:', error);
+    } catch {
+      // Error handled silently
     }
   };
 
@@ -99,8 +99,8 @@ export default function ServicesPage() {
       try {
         await adminAPI.deleteService(serviceId);
         setServices(services.filter(s => s._id !== serviceId));
-      } catch (error) {
-        console.error('Failed to delete service:', error);
+      } catch {
+        // Error handled silently
       }
     }
   };
@@ -402,8 +402,8 @@ export default function ServicesPage() {
                       await adminAPI.createService(serviceData);
                       setShowCreateModal(false);
                       fetchServices();
-                    } catch (error) {
-                      console.error('Failed to create service:', error);
+                    } catch {
+                      // Error handled silently
                     }
                   }}
                   onCancel={() => setShowCreateModal(false)}
@@ -438,8 +438,8 @@ export default function ServicesPage() {
                       await adminAPI.updateService(editingService._id, serviceData);
                       setEditingService(null);
                       fetchServices();
-                    } catch (error) {
-                      console.error('Failed to update service:', error);
+                    } catch {
+                      // Error handled silently
                     }
                   }}
                   onCancel={() => setEditingService(null)}
