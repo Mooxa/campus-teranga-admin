@@ -65,7 +65,7 @@ export default function LoginPage() {
           className="absolute -top-12 left-0 flex items-center space-x-2 text-neutral-600 hover:text-neutral-900 transition-colors duration-200"
         >
           <ArrowLeftIcon className="h-5 w-5" />
-          <span className="font-medium">Retour à l'accueil</span>
+          <span className="font-medium">Retour à l&apos;accueil</span>
         </button>
 
         {/* Logo and Header */}

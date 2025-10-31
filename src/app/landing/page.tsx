@@ -1042,7 +1042,7 @@ export default function LandingPage() {
               </p>
               <div className="flex space-x-6 mt-4 md:mt-0">
                 <a href="#" className="text-gray-400 hover:text-orange-400 transition-colors duration-200">Politique de confidentialité</a>
-                <a href="#" className="text-gray-400 hover:text-orange-400 transition-colors duration-200">Conditions d'utilisation</a>
+                <a href="#" className="text-gray-400 hover:text-orange-400 transition-colors duration-200">Conditions d&apos;utilisation</a>
                 <a href="#" className="text-gray-400 hover:text-orange-400 transition-colors duration-200">Mentions légales</a>
               </div>
             </div>
