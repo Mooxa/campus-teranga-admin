@@ -40,7 +40,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           } else {
             localStorage.removeItem('adminToken');
           }
-        } catch (error) {
+        } catch {
           localStorage.removeItem('adminToken');
         }
       }

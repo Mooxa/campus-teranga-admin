@@ -288,7 +288,7 @@ export default function RegisterPage() {
         {/* Back to Landing */}
         <div className="text-center">
           <Link href="/landing" className="text-sm text-neutral-600 hover:text-orange-600 transition-colors">
-            ← Retour à l'accueil
+            ← Retour à l&apos;accueil
           </Link>
         </div>
       </div>

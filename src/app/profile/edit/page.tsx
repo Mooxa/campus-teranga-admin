@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
-import { authAPI, User } from '@/lib/api';
+import { authAPI } from '@/lib/api';
 import { 
   UserIcon,
   EnvelopeIcon,
@@ -19,7 +19,7 @@ import {
 export default function EditProfilePage() {
   const { user, isAuthenticated, updateUser } = useAuth();
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
     fullName: '',
@@ -230,7 +230,7 @@ export default function EditProfilePage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-neutral-700 mb-2">
-                    Domaine d'études
+                    Domaine d&apos;études
                   </label>
                   <input
                     type="text"
@@ -244,7 +244,7 @@ export default function EditProfilePage() {
 
                 <div>
                   <label className="block text-sm font-medium text-neutral-700 mb-2">
-                    Année d'études
+                    Année d&apos;études
                   </label>
                   <select
                     name="yearOfStudy"
