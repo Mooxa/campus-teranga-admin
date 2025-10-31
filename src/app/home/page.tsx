@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { 
   AcademicCapIcon,
   CalendarIcon,
@@ -42,7 +41,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'formations' | 'events' | 'services' | 'communities'>('formations');
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredContent, setFilteredContent] = useState<any[]>([]);
+  const [filteredContent, setFilteredContent] = useState<(Formation | Event | Service | Community)[]>([]);
   const [selectedFormation, setSelectedFormation] = useState<Formation | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [selectedService, setSelectedService] = useState<Service | null>(null);
@@ -71,7 +70,7 @@ export default function HomePage() {
 
   useEffect(() => {
     // Filter content based on active tab and search query
-    let items: any[] = [];
+    let items: (Formation | Event | Service | Community)[] = [];
     switch(activeTab) {
       case 'formations':
         items = content.formations;
@@ -329,43 +328,50 @@ export default function HomePage() {
 
           {/* Content Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredContent.map((item: any) => (
+            {filteredContent.map((item) => {
+              const displayName = 'name' in item ? item.name : 'title' in item ? item.title : '';
+              const displayImage = 'image' in item ? item.image : undefined;
+              const displayShortName = 'shortName' in item ? item.shortName : undefined;
+              const displayDescription = 'description' in item ? item.description : '';
+              
+              return (
               <div key={item._id} className="bg-white rounded-2xl shadow-sm border border-neutral-200 hover:shadow-lg transition-all duration-300 overflow-hidden">
-                {item.image && (
-                  <div className="h-48 bg-gradient-to-br from-orange-100 to-orange-200 flex items-center justify-center">
-                    <img src={item.image} alt={item.name || item.title} className="w-full h-full object-cover" />
+                {displayImage && (
+                  <div className="h-48 bg-gradient-to-br from-orange-100 to-orange-200 flex items-center justify-center relative overflow-hidden">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={displayImage} alt={displayName || 'Content image'} className="w-full h-full object-cover" />
                   </div>
                 )}
                 <div className="p-6">
                   <h3 className="text-xl font-semibold text-neutral-900 mb-2 line-clamp-2">
-                    {item.name || item.title}
+                    {displayName}
                   </h3>
-                  {item.shortName && (
-                    <p className="text-sm text-neutral-500 mb-3">{item.shortName}</p>
+                  {displayShortName && (
+                    <p className="text-sm text-neutral-500 mb-3">{displayShortName}</p>
                   )}
                   <p className="text-neutral-600 text-sm line-clamp-3 mb-4">
-                    {item.description}
+                    {displayDescription}
                   </p>
                   
                   {activeTab === 'formations' && (
                     <>
                       <div className="space-y-2 text-sm text-neutral-500 mb-4">
-                        {item.programs?.length > 0 && (
+                        {('programs' in item && item.programs?.length) ? (
                           <div className="flex items-center">
                             <AcademicCapIcon className="h-4 w-4 mr-2" />
                             {item.programs.length} programme(s) disponible(s)
                           </div>
-                        )}
-                        {item.location && (
+                        ) : null}
+                        {('location' in item && item.location) ? (
                           <div className="flex items-center">
                             <MapPinIcon className="h-4 w-4 mr-2" />
                             {item.location.city}, {item.location.district}
                           </div>
-                        )}
+                        ) : null}
                       </div>
                       <button
                       onClick={() => {
-                        setSelectedFormation(item);
+                        setSelectedFormation(item as Formation);
                         setModalType('formation');
                         setIsModalOpen(true);
                       }}
@@ -380,28 +386,28 @@ export default function HomePage() {
                   {activeTab === 'events' && (
                     <>
                       <div className="space-y-2 text-sm text-neutral-500 mb-4">
-                        {item.date && (
+                        {('date' in item && item.date) ? (
                           <div className="flex items-center">
                             <ClockIcon className="h-4 w-4 mr-2" />
                             {new Date(item.date).toLocaleDateString('fr-FR')}
                           </div>
-                        )}
-                        {item.location && (
+                        ) : null}
+                        {('location' in item && item.location) ? (
                           <div className="flex items-center">
                             <MapPinIcon className="h-4 w-4 mr-2" />
                             {item.location.name}
                           </div>
-                        )}
-                        {item.capacity && (
+                        ) : null}
+                        {('capacity' in item && item.capacity) ? (
                           <div className="flex items-center">
                             <UsersIcon className="h-4 w-4 mr-2" />
-                            {item.registeredUsers?.length || 0} / {item.capacity} participants
+                            {('registeredUsers' in item && item.registeredUsers?.length) || 0} / {item.capacity} participants
                           </div>
-                        )}
+                        ) : null}
                       </div>
                       <button
                         onClick={() => {
-                          setSelectedEvent(item);
+                          setSelectedEvent(item as Event);
                           setModalType('event');
                           setIsModalOpen(true);
                         }}
@@ -416,7 +422,7 @@ export default function HomePage() {
                   {activeTab === 'services' && (
                     <button
                       onClick={() => {
-                        setSelectedService(item);
+                        setSelectedService(item as Service);
                         setModalType('service');
                         setIsModalOpen(true);
                       }}
@@ -432,11 +438,11 @@ export default function HomePage() {
                       <div className="space-y-2 text-sm text-neutral-500 mb-4">
                         <div className="flex items-center">
                           <UserGroupIcon className="h-4 w-4 mr-2" />
-                          {item.members?.length || 0} membre(s)
+                          {('members' in item && item.members?.length) || 0} membre(s)
                         </div>
                         <div className="flex items-center">
                           <ChatBubbleLeftRightIcon className="h-4 w-4 mr-2" />
-                          {item.posts?.length || 0} publication(s)
+                          {('posts' in item && item.posts?.length) || 0} publication(s)
                         </div>
                       </div>
                       <button
@@ -450,7 +456,8 @@ export default function HomePage() {
                   )}
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
 
           {filteredContent.length === 0 && (
