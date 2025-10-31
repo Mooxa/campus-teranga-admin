@@ -1,13 +1,13 @@
-'use client';
+'use client'
 
-import React, { useEffect, useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { adminAPI, Formation, Program } from '@/lib/api';
-import AdminLayout from '@/components/Layout/AdminLayout';
-import ProtectedRoute from '@/components/ProtectedRoute';
-import { 
-  PlusIcon, 
-  PencilIcon, 
+import React, { useEffect, useState } from 'react'
+import { useAuth } from '@/contexts/AuthContext'
+import { adminAPI, Formation, Program } from '@/lib/api'
+import AdminLayout from '@/components/Layout/AdminLayout'
+import ProtectedRoute from '@/components/ProtectedRoute'
+import {
+  PlusIcon,
+  PencilIcon,
   TrashIcon,
   EyeIcon,
   EyeSlashIcon,
@@ -16,131 +16,141 @@ import {
   BuildingOfficeIcon,
   MapPinIcon,
   BookOpenIcon,
-  XMarkIcon
-} from '@heroicons/react/24/outline';
+  XMarkIcon,
+} from '@heroicons/react/24/outline'
 
 export default function FormationsPage() {
-  const { isAuthenticated, isLoading } = useAuth();
-  const [formations, setFormations] = useState<Formation[]>([]);
-  const [filteredFormations, setFilteredFormations] = useState<Formation[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { isAuthenticated, isLoading } = useAuth()
+  const [formations, setFormations] = useState<Formation[]>([])
+  const [filteredFormations, setFilteredFormations] = useState<Formation[]>([])
+  const [loading, setLoading] = useState(true)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_editingFormation, setEditingFormation] = useState<Formation | null>(null);
-  const [selectedFormation, setSelectedFormation] = useState<Formation | null>(null);
-  const [showProgramsModal, setShowProgramsModal] = useState(false);
-  const [editingProgram, setEditingProgram] = useState<{ program: Program; index: number } | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [typeFilter, setTypeFilter] = useState<'all' | 'public' | 'private'>('all');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
-  const [sortBy, setSortBy] = useState<'name' | 'type' | 'created'>('name');
+  const [_editingFormation, setEditingFormation] = useState<Formation | null>(null)
+  const [selectedFormation, setSelectedFormation] = useState<Formation | null>(null)
+  const [showProgramsModal, setShowProgramsModal] = useState(false)
+  const [editingProgram, setEditingProgram] = useState<{ program: Program; index: number } | null>(
+    null
+  )
+  const [searchQuery, setSearchQuery] = useState('')
+  const [typeFilter, setTypeFilter] = useState<'all' | 'public' | 'private'>('all')
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all')
+  const [sortBy, setSortBy] = useState<'name' | 'type' | 'created'>('name')
 
   useEffect(() => {
     if (isAuthenticated) {
-      fetchFormations();
+      fetchFormations()
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated])
 
   // Filter and sort formations
   useEffect(() => {
-    const filtered = formations.filter(formation => {
-      const matchesSearch = formation.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           formation.shortName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           formation.description?.toLowerCase().includes(searchQuery.toLowerCase());
-      
-      const matchesType = typeFilter === 'all' || formation.type === typeFilter;
-      const matchesStatus = statusFilter === 'all' || 
-                           (statusFilter === 'active' && formation.isActive) ||
-                           (statusFilter === 'inactive' && !formation.isActive);
-      
-      return matchesSearch && matchesType && matchesStatus;
-    });
+    const filtered = formations.filter((formation) => {
+      const matchesSearch =
+        formation.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        formation.shortName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        formation.description?.toLowerCase().includes(searchQuery.toLowerCase())
+
+      const matchesType = typeFilter === 'all' || formation.type === typeFilter
+      const matchesStatus =
+        statusFilter === 'all' ||
+        (statusFilter === 'active' && formation.isActive) ||
+        (statusFilter === 'inactive' && !formation.isActive)
+
+      return matchesSearch && matchesType && matchesStatus
+    })
 
     // Sort formations
     filtered.sort((a, b) => {
       switch (sortBy) {
         case 'name':
-          const aName = a.name || '';
-          const bName = b.name || '';
-          return aName.localeCompare(bName);
+          const aName = a.name || ''
+          const bName = b.name || ''
+          return aName.localeCompare(bName)
         case 'type':
-          return a.type.localeCompare(b.type);
+          return a.type.localeCompare(b.type)
         case 'created':
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         default:
-          return 0;
+          return 0
       }
-    });
+    })
 
-    setFilteredFormations(filtered);
-  }, [formations, searchQuery, typeFilter, statusFilter, sortBy]);
+    setFilteredFormations(filtered)
+  }, [formations, searchQuery, typeFilter, statusFilter, sortBy])
 
   const fetchFormations = async () => {
     try {
-      const data = await adminAPI.getFormations();
-      setFormations(data);
+      const data = await adminAPI.getFormations()
+      setFormations(data)
     } catch {
       // Error handled silently
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleToggleActive = async (formation: Formation) => {
     try {
-      await adminAPI.updateFormation(formation._id, { isActive: !formation.isActive });
-      setFormations(formations.map(f => f._id === formation._id ? { ...f, isActive: !f.isActive } : f));
+      await adminAPI.updateFormation(formation._id, { isActive: !formation.isActive })
+      setFormations(
+        formations.map((f) => (f._id === formation._id ? { ...f, isActive: !f.isActive } : f))
+      )
     } catch {
       // Error handled silently
     }
-  };
+  }
 
   const handleDeleteFormation = async (formationId: string) => {
     if (confirm('Are you sure you want to delete this formation?')) {
       try {
-        await adminAPI.deleteFormation(formationId);
-        setFormations(formations.filter(f => f._id !== formationId));
+        await adminAPI.deleteFormation(formationId)
+        setFormations(formations.filter((f) => f._id !== formationId))
       } catch {
         // Error handled silently
       }
     }
-  };
+  }
 
   const handleViewPrograms = (formation: Formation) => {
-    setSelectedFormation(formation);
-    setShowProgramsModal(true);
-  };
+    setSelectedFormation(formation)
+    setShowProgramsModal(true)
+  }
 
   const handleAddProgram = () => {
-    setEditingProgram({ program: { name: '', level: '', duration: '', language: '' }, index: -1 });
-  };
+    setEditingProgram({ program: { name: '', level: '', duration: '', language: '' }, index: -1 })
+  }
 
   const handleSaveProgram = async () => {
-    if (!selectedFormation || !editingProgram) return;
+    if (!selectedFormation || !editingProgram) return
 
     try {
       if (editingProgram.index === -1) {
-        await adminAPI.addProgram(selectedFormation._id, editingProgram.program);
+        await adminAPI.addProgram(selectedFormation._id, editingProgram.program)
       } else {
-        await adminAPI.updateProgram(selectedFormation._id, editingProgram.program._id!, editingProgram.program);
+        await adminAPI.updateProgram(
+          selectedFormation._id,
+          editingProgram.program._id!,
+          editingProgram.program
+        )
       }
-      await fetchFormations();
-      setEditingProgram(null);
+      await fetchFormations()
+      setEditingProgram(null)
     } catch {
       // Error handled silently
     }
-  };
+  }
 
   const handleDeleteProgram = async (program: Program) => {
-    if (!program._id || !selectedFormation) return;
-    if (!confirm('Are you sure you want to delete this program?')) return;
+    if (!program._id || !selectedFormation) return
+    if (!confirm('Are you sure you want to delete this program?')) return
 
     try {
-      await adminAPI.deleteProgram(selectedFormation._id, program._id);
-      await fetchFormations();
+      await adminAPI.deleteProgram(selectedFormation._id, program._id)
+      await fetchFormations()
     } catch {
       // Error handled silently
     }
-  };
+  }
 
   if (isLoading || loading) {
     return (
@@ -160,11 +170,11 @@ export default function FormationsPage() {
           </div>
         </AdminLayout>
       </ProtectedRoute>
-    );
+    )
   }
 
   if (!isAuthenticated) {
-    return null;
+    return null
   }
 
   return (
@@ -181,7 +191,9 @@ export default function FormationsPage() {
                   </div>
                   <div>
                     <h1 className="text-3xl font-bold text-neutral-900">Formations Management</h1>
-                    <p className="text-neutral-600 mt-1">Manage educational institutions and programs</p>
+                    <p className="text-neutral-600 mt-1">
+                      Manage educational institutions and programs
+                    </p>
                   </div>
                 </div>
                 <button
@@ -216,7 +228,9 @@ export default function FormationsPage() {
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-neutral-600">Active</p>
-                    <p className="text-2xl font-bold text-neutral-900">{formations.filter(f => f.isActive).length}</p>
+                    <p className="text-2xl font-bold text-neutral-900">
+                      {formations.filter((f) => f.isActive).length}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -227,7 +241,9 @@ export default function FormationsPage() {
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-neutral-600">Public</p>
-                    <p className="text-2xl font-bold text-neutral-900">{formations.filter(f => f.type === 'public').length}</p>
+                    <p className="text-2xl font-bold text-neutral-900">
+                      {formations.filter((f) => f.type === 'public').length}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -271,7 +287,9 @@ export default function FormationsPage() {
                   </select>
                   <select
                     value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value as 'all' | 'active' | 'inactive')}
+                    onChange={(e) =>
+                      setStatusFilter(e.target.value as 'all' | 'active' | 'inactive')
+                    }
                     className="px-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-orange-500"
                   >
                     <option value="all">All Status</option>
@@ -294,7 +312,10 @@ export default function FormationsPage() {
             {/* Formations List */}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {filteredFormations.map((formation) => (
-                <div key={formation._id} className="bg-white rounded-2xl shadow-sm border border-neutral-200 hover:shadow-lg transition-all duration-300 group">
+                <div
+                  key={formation._id}
+                  className="bg-white rounded-2xl shadow-sm border border-neutral-200 hover:shadow-lg transition-all duration-300 group"
+                >
                   <div className="p-6">
                     {/* Header */}
                     <div className="mb-4">
@@ -303,18 +324,22 @@ export default function FormationsPage() {
                       </h3>
                       <p className="text-sm text-neutral-500 mt-1">{formation.shortName}</p>
                       <div className="flex items-center mt-2 space-x-2">
-                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                          formation.isActive 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-red-100 text-red-800'
-                        }`}>
+                        <span
+                          className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                            formation.isActive
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-red-100 text-red-800'
+                          }`}
+                        >
                           {formation.isActive ? 'Active' : 'Inactive'}
                         </span>
-                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                          formation.type === 'public' 
-                            ? 'bg-blue-100 text-blue-800'
-                            : 'bg-purple-100 text-purple-800'
-                        }`}>
+                        <span
+                          className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                            formation.type === 'public'
+                              ? 'bg-blue-100 text-blue-800'
+                              : 'bg-purple-100 text-purple-800'
+                          }`}
+                        >
                           {formation.type}
                         </span>
                       </div>
@@ -330,7 +355,9 @@ export default function FormationsPage() {
                       <div className="space-y-2 mb-4 text-sm text-neutral-500">
                         <div className="flex items-center">
                           <MapPinIcon className="h-4 w-4 mr-2 text-orange-500" />
-                          <span>{formation.location.city}, {formation.location.district}</span>
+                          <span>
+                            {formation.location.city}, {formation.location.district}
+                          </span>
                         </div>
                       </div>
                     )}
@@ -360,7 +387,11 @@ export default function FormationsPage() {
                           className="p-2 text-neutral-400 hover:text-orange-600 rounded-lg hover:bg-orange-50 transition-all"
                           title={formation.isActive ? 'Deactivate' : 'Activate'}
                         >
-                          {formation.isActive ? <EyeSlashIcon className="h-4 w-4" /> : <EyeIcon className="h-4 w-4" />}
+                          {formation.isActive ? (
+                            <EyeSlashIcon className="h-4 w-4" />
+                          ) : (
+                            <EyeIcon className="h-4 w-4" />
+                          )}
                         </button>
                         <button
                           onClick={() => setEditingFormation(formation)}
@@ -400,14 +431,16 @@ export default function FormationsPage() {
               <div className="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                 <div className="sticky top-0 bg-white border-b border-neutral-200 px-6 py-4 flex items-center justify-between">
                   <div>
-                    <h2 className="text-xl font-semibold text-neutral-900">{selectedFormation.name}</h2>
+                    <h2 className="text-xl font-semibold text-neutral-900">
+                      {selectedFormation.name}
+                    </h2>
                     <p className="text-sm text-neutral-500">{selectedFormation.shortName}</p>
                   </div>
                   <button
                     onClick={() => {
-                      setShowProgramsModal(false);
-                      setSelectedFormation(null);
-                      setEditingProgram(null);
+                      setShowProgramsModal(false)
+                      setSelectedFormation(null)
+                      setEditingProgram(null)
                     }}
                     className="p-2 text-neutral-400 hover:text-neutral-600 rounded-lg hover:bg-neutral-100 transition-all"
                   >
@@ -418,35 +451,55 @@ export default function FormationsPage() {
                 <div className="p-6">
                   {editingProgram ? (
                     <div className="space-y-4">
-                      <h3 className="text-lg font-semibold text-neutral-900">{
-                        editingProgram.index === -1 ? 'Add New Program' : 'Edit Program'
-                      }</h3>
+                      <h3 className="text-lg font-semibold text-neutral-900">
+                        {editingProgram.index === -1 ? 'Add New Program' : 'Edit Program'}
+                      </h3>
                       <input
                         type="text"
                         placeholder="Program Name"
                         value={editingProgram.program.name}
-                        onChange={(e) => setEditingProgram({ ...editingProgram, program: { ...editingProgram.program, name: e.target.value } })}
+                        onChange={(e) =>
+                          setEditingProgram({
+                            ...editingProgram,
+                            program: { ...editingProgram.program, name: e.target.value },
+                          })
+                        }
                         className="w-full px-4 py-2 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-orange-500"
                       />
                       <input
                         type="text"
                         placeholder="Level (e.g., Bachelor, Master, PhD)"
                         value={editingProgram.program.level}
-                        onChange={(e) => setEditingProgram({ ...editingProgram, program: { ...editingProgram.program, level: e.target.value } })}
+                        onChange={(e) =>
+                          setEditingProgram({
+                            ...editingProgram,
+                            program: { ...editingProgram.program, level: e.target.value },
+                          })
+                        }
                         className="w-full px-4 py-2 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-orange-500"
                       />
                       <input
                         type="text"
                         placeholder="Duration (e.g., 4 years)"
                         value={editingProgram.program.duration}
-                        onChange={(e) => setEditingProgram({ ...editingProgram, program: { ...editingProgram.program, duration: e.target.value } })}
+                        onChange={(e) =>
+                          setEditingProgram({
+                            ...editingProgram,
+                            program: { ...editingProgram.program, duration: e.target.value },
+                          })
+                        }
                         className="w-full px-4 py-2 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-orange-500"
                       />
                       <input
                         type="text"
                         placeholder="Language (e.g., French, English)"
                         value={editingProgram.program.language}
-                        onChange={(e) => setEditingProgram({ ...editingProgram, program: { ...editingProgram.program, language: e.target.value } })}
+                        onChange={(e) =>
+                          setEditingProgram({
+                            ...editingProgram,
+                            program: { ...editingProgram.program, language: e.target.value },
+                          })
+                        }
                         className="w-full px-4 py-2 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-orange-500"
                       />
                       <div className="flex space-x-3">
@@ -467,7 +520,9 @@ export default function FormationsPage() {
                   ) : (
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
-                        <h3 className="text-lg font-semibold text-neutral-900">Programs ({selectedFormation.programs?.length || 0})</h3>
+                        <h3 className="text-lg font-semibold text-neutral-900">
+                          Programs ({selectedFormation.programs?.length || 0})
+                        </h3>
                         <button
                           onClick={handleAddProgram}
                           className="inline-flex items-center px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-all"
@@ -498,14 +553,21 @@ export default function FormationsPage() {
                               </div>
                             </div>
                             <div className="space-y-1 text-sm text-neutral-600">
-                              <p><span className="font-medium">Level:</span> {program.level}</p>
-                              <p><span className="font-medium">Duration:</span> {program.duration}</p>
-                              <p><span className="font-medium">Language:</span> {program.language}</p>
+                              <p>
+                                <span className="font-medium">Level:</span> {program.level}
+                              </p>
+                              <p>
+                                <span className="font-medium">Duration:</span> {program.duration}
+                              </p>
+                              <p>
+                                <span className="font-medium">Language:</span> {program.language}
+                              </p>
                             </div>
                           </div>
                         ))}
 
-                        {(!selectedFormation.programs || selectedFormation.programs.length === 0) && (
+                        {(!selectedFormation.programs ||
+                          selectedFormation.programs.length === 0) && (
                           <div className="text-center py-8 text-neutral-500">
                             No programs yet. Add one to get started.
                           </div>
@@ -520,6 +582,5 @@ export default function FormationsPage() {
         </div>
       </AdminLayout>
     </ProtectedRoute>
-  );
+  )
 }
-

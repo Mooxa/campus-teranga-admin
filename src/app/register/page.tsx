@@ -1,67 +1,67 @@
-'use client';
+'use client'
 
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
-import Link from 'next/link';
-import { 
-  UserIcon, 
-  PhoneIcon, 
-  EnvelopeIcon, 
+import React, { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { useAuth } from '@/contexts/AuthContext'
+import Link from 'next/link'
+import {
+  UserIcon,
+  PhoneIcon,
+  EnvelopeIcon,
   LockClosedIcon,
   EyeIcon,
   EyeSlashIcon,
-  CheckCircleIcon
-} from '@heroicons/react/24/outline';
+  CheckCircleIcon,
+} from '@heroicons/react/24/outline'
 
 export default function RegisterPage() {
-  const router = useRouter();
-  const { register, isAuthenticated, isLoading: authLoading } = useAuth();
-  
+  const router = useRouter()
+  const { register, isAuthenticated, isLoading: authLoading } = useAuth()
+
   const [formData, setFormData] = useState({
     fullName: '',
     phoneNumber: '',
     email: '',
     password: '',
-    confirmPassword: ''
-  });
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
+    confirmPassword: '',
+  })
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState(false)
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.push('/dashboard');
+      router.push('/dashboard')
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, router])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
-    });
-    setError('');
-  };
+      [e.target.name]: e.target.value,
+    })
+    setError('')
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setIsLoading(true);
+    e.preventDefault()
+    setError('')
+    setIsLoading(true)
 
     // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
-      setError('Les mots de passe ne correspondent pas');
-      setIsLoading(false);
-      return;
+      setError('Les mots de passe ne correspondent pas')
+      setIsLoading(false)
+      return
     }
 
     // Validate password strength
     if (formData.password.length < 8) {
-      setError('Le mot de passe doit contenir au moins 8 caractères');
-      setIsLoading(false);
-      return;
+      setError('Le mot de passe doit contenir au moins 8 caractères')
+      setIsLoading(false)
+      return
     }
 
     try {
@@ -71,25 +71,25 @@ export default function RegisterPage() {
         formData.email || undefined,
         formData.password,
         formData.confirmPassword
-      );
-      
-      setSuccess(true);
+      )
+
+      setSuccess(true)
       setTimeout(() => {
-        router.push('/login');
-      }, 2000);
+        router.push('/login')
+      }, 2000)
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Erreur lors de l\'inscription');
+      setError(err instanceof Error ? err.message : "Erreur lors de l'inscription")
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-neutral-50">
         <div className="animate-spin rounded-full h-12 w-12 border-2 border-orange-200 border-t-orange-500"></div>
       </div>
-    );
+    )
   }
 
   return (
@@ -132,7 +132,10 @@ export default function RegisterPage() {
             <div className="space-y-4">
               {/* Full Name */}
               <div>
-                <label htmlFor="fullName" className="block text-sm font-medium text-neutral-700 mb-2">
+                <label
+                  htmlFor="fullName"
+                  className="block text-sm font-medium text-neutral-700 mb-2"
+                >
                   Nom complet *
                 </label>
                 <div className="relative">
@@ -154,7 +157,10 @@ export default function RegisterPage() {
 
               {/* Phone Number */}
               <div>
-                <label htmlFor="phoneNumber" className="block text-sm font-medium text-neutral-700 mb-2">
+                <label
+                  htmlFor="phoneNumber"
+                  className="block text-sm font-medium text-neutral-700 mb-2"
+                >
                   Numéro de téléphone *
                 </label>
                 <div className="relative">
@@ -197,7 +203,10 @@ export default function RegisterPage() {
 
               {/* Password */}
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-neutral-700 mb-2">
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-neutral-700 mb-2"
+                >
                   Mot de passe *
                 </label>
                 <div className="relative">
@@ -230,7 +239,10 @@ export default function RegisterPage() {
 
               {/* Confirm Password */}
               <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-neutral-700 mb-2">
+                <label
+                  htmlFor="confirmPassword"
+                  className="block text-sm font-medium text-neutral-700 mb-2"
+                >
                   Confirmer le mot de passe *
                 </label>
                 <div className="relative">
@@ -277,7 +289,10 @@ export default function RegisterPage() {
             <div className="text-center">
               <p className="text-sm text-neutral-600">
                 Vous avez déjà un compte ?{' '}
-                <Link href="/login" className="font-medium text-orange-600 hover:text-orange-700 transition-colors">
+                <Link
+                  href="/login"
+                  className="font-medium text-orange-600 hover:text-orange-700 transition-colors"
+                >
                   Connectez-vous
                 </Link>
               </p>
@@ -287,12 +302,14 @@ export default function RegisterPage() {
 
         {/* Back to Landing */}
         <div className="text-center">
-          <Link href="/landing" className="text-sm text-neutral-600 hover:text-orange-600 transition-colors">
+          <Link
+            href="/landing"
+            className="text-sm text-neutral-600 hover:text-orange-600 transition-colors"
+          >
             ← Retour à l&apos;accueil
           </Link>
         </div>
       </div>
     </div>
-  );
+  )
 }
-

@@ -1,13 +1,13 @@
-'use client';
+'use client'
 
-import React, { useEffect, useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { adminAPI, User } from '@/lib/api';
-import AdminLayout from '@/components/Layout/AdminLayout';
-import ProtectedRoute from '@/components/ProtectedRoute';
-import { 
-  PlusIcon, 
-  PencilIcon, 
+import React, { useEffect, useState } from 'react'
+import { useAuth } from '@/contexts/AuthContext'
+import { adminAPI, User } from '@/lib/api'
+import AdminLayout from '@/components/Layout/AdminLayout'
+import ProtectedRoute from '@/components/ProtectedRoute'
+import {
+  PlusIcon,
+  PencilIcon,
   TrashIcon,
   EyeIcon,
   EyeSlashIcon,
@@ -19,96 +19,101 @@ import {
   EnvelopeIcon,
   PhoneIcon,
   MapPinIcon,
-  AcademicCapIcon
-} from '@heroicons/react/24/outline';
+  AcademicCapIcon,
+} from '@heroicons/react/24/outline'
 
 export default function UsersPage() {
-  const { isAuthenticated, isLoading } = useAuth();
-  const [users, setUsers] = useState<User[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { isAuthenticated, isLoading } = useAuth()
+  const [users, setUsers] = useState<User[]>([])
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([])
+  const [loading, setLoading] = useState(true)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_showCreateModal, setShowCreateModal] = useState(false);
+  const [_showCreateModal, setShowCreateModal] = useState(false)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_editingUser, setEditingUser] = useState<User | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [roleFilter, setRoleFilter] = useState<'all' | 'super_admin' | 'admin' | 'user'>('all');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
-  const [sortBy, setSortBy] = useState<'name' | 'role' | 'created'>('name');
+  const [_editingUser, setEditingUser] = useState<User | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [roleFilter, setRoleFilter] = useState<'all' | 'super_admin' | 'admin' | 'user'>('all')
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all')
+  const [sortBy, setSortBy] = useState<'name' | 'role' | 'created'>('name')
 
   useEffect(() => {
     if (isAuthenticated) {
-      fetchUsers();
+      fetchUsers()
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated])
 
   // Filter and sort users
   useEffect(() => {
-    const filtered = users.filter(user => {
-      const matchesSearch = (user.fullName && user.fullName.toLowerCase().includes(searchQuery.toLowerCase())) ||
-                           (user.phoneNumber && user.phoneNumber.toLowerCase().includes(searchQuery.toLowerCase())) ||
-                           (user.email && user.email.toLowerCase().includes(searchQuery.toLowerCase())) ||
-                           (user.university && user.university.toLowerCase().includes(searchQuery.toLowerCase())) ||
-                           (user.country && user.country.toLowerCase().includes(searchQuery.toLowerCase()));
-      
-      const matchesRole = roleFilter === 'all' || user.role === roleFilter;
-      const matchesStatus = statusFilter === 'all' || 
-                           (statusFilter === 'active' && user.isActive) ||
-                           (statusFilter === 'inactive' && !user.isActive);
-      
-      return matchesSearch && matchesRole && matchesStatus;
-    });
+    const filtered = users.filter((user) => {
+      const matchesSearch =
+        (user.fullName && user.fullName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (user.phoneNumber && user.phoneNumber.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (user.email && user.email.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (user.university && user.university.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (user.country && user.country.toLowerCase().includes(searchQuery.toLowerCase()))
+
+      const matchesRole = roleFilter === 'all' || user.role === roleFilter
+      const matchesStatus =
+        statusFilter === 'all' ||
+        (statusFilter === 'active' && user.isActive) ||
+        (statusFilter === 'inactive' && !user.isActive)
+
+      return matchesSearch && matchesRole && matchesStatus
+    })
 
     // Sort users
     filtered.sort((a, b) => {
       switch (sortBy) {
         case 'name':
-          const aName = a.fullName || '';
-          const bName = b.fullName || '';
-          return aName.localeCompare(bName);
+          const aName = a.fullName || ''
+          const bName = b.fullName || ''
+          return aName.localeCompare(bName)
         case 'role':
-          const roleOrder = { super_admin: 0, admin: 1, user: 2 };
-          return roleOrder[a.role as keyof typeof roleOrder] - roleOrder[b.role as keyof typeof roleOrder];
+          const roleOrder = { super_admin: 0, admin: 1, user: 2 }
+          return (
+            roleOrder[a.role as keyof typeof roleOrder] -
+            roleOrder[b.role as keyof typeof roleOrder]
+          )
         case 'created':
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         default:
-          return 0;
+          return 0
       }
-    });
+    })
 
-    setFilteredUsers(filtered);
-  }, [users, searchQuery, roleFilter, statusFilter, sortBy]);
+    setFilteredUsers(filtered)
+  }, [users, searchQuery, roleFilter, statusFilter, sortBy])
 
   const fetchUsers = async () => {
     try {
-      const data = await adminAPI.getUsers();
-      setUsers(data);
+      const data = await adminAPI.getUsers()
+      setUsers(data)
     } catch {
       // Error handled silently
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleToggleActive = async (user: User) => {
     try {
-      await adminAPI.updateUser(user._id, { isActive: !user.isActive });
-      setUsers(users.map(u => u._id === user._id ? { ...u, isActive: !u.isActive } : u));
+      await adminAPI.updateUser(user._id, { isActive: !user.isActive })
+      setUsers(users.map((u) => (u._id === user._id ? { ...u, isActive: !u.isActive } : u)))
     } catch {
       // Error handled silently
     }
-  };
+  }
 
   const handleDeleteUser = async (userId: string) => {
     if (confirm('Are you sure you want to delete this user?')) {
       try {
-        await adminAPI.deleteUser(userId);
-        setUsers(users.filter(u => u._id !== userId));
+        await adminAPI.deleteUser(userId)
+        setUsers(users.filter((u) => u._id !== userId))
       } catch {
         // Error handled silently
       }
     }
-  };
+  }
 
   if (isLoading || loading) {
     return (
@@ -128,11 +133,11 @@ export default function UsersPage() {
           </div>
         </AdminLayout>
       </ProtectedRoute>
-    );
+    )
   }
 
   if (!isAuthenticated) {
-    return null;
+    return null
   }
 
   return (
@@ -149,7 +154,9 @@ export default function UsersPage() {
                   </div>
                   <div>
                     <h1 className="text-3xl font-bold text-neutral-900">Users Management</h1>
-                    <p className="text-neutral-600 mt-1">Manage user accounts, roles, and permissions</p>
+                    <p className="text-neutral-600 mt-1">
+                      Manage user accounts, roles, and permissions
+                    </p>
                   </div>
                 </div>
                 <button
@@ -185,7 +192,9 @@ export default function UsersPage() {
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-neutral-600">Active Users</p>
-                    <p className="text-2xl font-bold text-neutral-900">{users.filter(u => u.isActive).length}</p>
+                    <p className="text-2xl font-bold text-neutral-900">
+                      {users.filter((u) => u.isActive).length}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -196,7 +205,9 @@ export default function UsersPage() {
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-neutral-600">Admins</p>
-                    <p className="text-2xl font-bold text-neutral-900">{users.filter(u => u.role === 'admin' || u.role === 'super_admin').length}</p>
+                    <p className="text-2xl font-bold text-neutral-900">
+                      {users.filter((u) => u.role === 'admin' || u.role === 'super_admin').length}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -208,7 +219,11 @@ export default function UsersPage() {
                   <div className="ml-4">
                     <p className="text-sm font-medium text-neutral-600">This Month</p>
                     <p className="text-2xl font-bold text-neutral-900">
-                      {users.filter(u => new Date(u.createdAt).getMonth() === new Date().getMonth()).length}
+                      {
+                        users.filter(
+                          (u) => new Date(u.createdAt).getMonth() === new Date().getMonth()
+                        ).length
+                      }
                     </p>
                   </div>
                 </div>
@@ -229,12 +244,14 @@ export default function UsersPage() {
                     className="w-full pl-10 pr-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
                   />
                 </div>
-                
+
                 {/* Filters */}
                 <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
                   <select
                     value={roleFilter}
-                    onChange={(e) => setRoleFilter(e.target.value as 'all' | 'super_admin' | 'admin' | 'user')}
+                    onChange={(e) =>
+                      setRoleFilter(e.target.value as 'all' | 'super_admin' | 'admin' | 'user')
+                    }
                     className="px-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
                   >
                     <option value="all">All Roles</option>
@@ -242,17 +259,19 @@ export default function UsersPage() {
                     <option value="admin">Admin</option>
                     <option value="user">User</option>
                   </select>
-                  
+
                   <select
                     value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value as 'all' | 'active' | 'inactive')}
+                    onChange={(e) =>
+                      setStatusFilter(e.target.value as 'all' | 'active' | 'inactive')
+                    }
                     className="px-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
                   >
                     <option value="all">All Status</option>
                     <option value="active">Active Only</option>
                     <option value="inactive">Inactive Only</option>
                   </select>
-                  
+
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value as 'name' | 'role' | 'created')}
@@ -269,7 +288,10 @@ export default function UsersPage() {
             {/* Users Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {filteredUsers.map((user) => (
-                <div key={user._id} className="bg-white rounded-2xl shadow-sm border border-neutral-200 hover:shadow-lg transition-all duration-300 group">
+                <div
+                  key={user._id}
+                  className="bg-white rounded-2xl shadow-sm border border-neutral-200 hover:shadow-lg transition-all duration-300 group"
+                >
                   <div className="p-6">
                     {/* Header */}
                     <div className="flex items-start justify-between mb-4">
@@ -280,22 +302,26 @@ export default function UsersPage() {
                               {user.fullName.charAt(0).toUpperCase()}
                             </span>
                           </div>
-                          <div className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-white ${
-                            user.isActive ? 'bg-green-500' : 'bg-red-500'
-                          }`}></div>
+                          <div
+                            className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-white ${
+                              user.isActive ? 'bg-green-500' : 'bg-red-500'
+                            }`}
+                          ></div>
                         </div>
                         <div className="flex-1">
                           <h3 className="text-lg font-semibold text-neutral-900 group-hover:text-orange-600 transition-colors duration-200">
                             {user.fullName}
                           </h3>
                           <div className="flex items-center mt-1">
-                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                              user.role === 'super_admin' 
-                                ? 'bg-red-100 text-red-800'
-                                : user.role === 'admin'
-                                ? 'bg-blue-100 text-blue-800'
-                                : 'bg-gray-100 text-gray-800'
-                            }`}>
+                            <span
+                              className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                                user.role === 'super_admin'
+                                  ? 'bg-red-100 text-red-800'
+                                  : user.role === 'admin'
+                                    ? 'bg-blue-100 text-blue-800'
+                                    : 'bg-gray-100 text-gray-800'
+                              }`}
+                            >
                               {user.role.replace('_', ' ').toUpperCase()}
                             </span>
                           </div>
@@ -307,7 +333,7 @@ export default function UsersPage() {
                         </button>
                       </div>
                     </div>
-                    
+
                     {/* Contact Info */}
                     <div className="space-y-3 mb-6">
                       <div className="flex items-center text-sm text-neutral-500">
@@ -375,14 +401,16 @@ export default function UsersPage() {
                   <UserGroupIcon className="h-12 w-12 text-orange-600" />
                 </div>
                 <h3 className="text-xl font-semibold text-neutral-900 mb-2">
-                  {searchQuery || roleFilter !== 'all' || statusFilter !== 'all' ? 'No users found' : 'No users yet'}
+                  {searchQuery || roleFilter !== 'all' || statusFilter !== 'all'
+                    ? 'No users found'
+                    : 'No users yet'}
                 </h3>
                 <p className="text-neutral-600 mb-6">
-                  {searchQuery || roleFilter !== 'all' || statusFilter !== 'all' 
-                    ? 'Try adjusting your search or filter criteria.' 
+                  {searchQuery || roleFilter !== 'all' || statusFilter !== 'all'
+                    ? 'Try adjusting your search or filter criteria.'
                     : 'Get started by adding your first user.'}
                 </p>
-                {(!searchQuery && roleFilter === 'all' && statusFilter === 'all') && (
+                {!searchQuery && roleFilter === 'all' && statusFilter === 'all' && (
                   <button
                     onClick={() => setShowCreateModal(true)}
                     className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
@@ -397,5 +425,5 @@ export default function UsersPage() {
         </div>
       </AdminLayout>
     </ProtectedRoute>
-  );
+  )
 }

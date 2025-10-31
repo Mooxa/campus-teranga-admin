@@ -6,9 +6,12 @@
     "dev": "next dev --turbopack -p 3001",
     "build": "next build",
     "start": "next start -p 3001",
-    "lint": "eslint",
+    "lint": "next lint",
     "lint:fix": "eslint --fix",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,css,md}\"",
     "type-check": "tsc --noEmit",
+    "check": "npm run lint && npm run type-check && npm run format:check",
     "vercel-build": "next build"
   },
   "dependencies": {
@@ -30,6 +33,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.5.4",
+    "prettier": "^3.6.2",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

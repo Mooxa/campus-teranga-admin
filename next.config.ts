@@ -1,12 +1,17 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next'
+import path from 'path'
 
 const nextConfig: NextConfig = {
   // Optimize for Vercel deployment
   output: 'standalone',
-  
+
+  // Set output file tracing root to silence workspace warning
+  outputFileTracingRoot: path.join(__dirname, '../../'),
+
   // Environment variables
   env: {
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'https://campus-teranga-backend.onrender.com/api',
+    NEXT_PUBLIC_API_URL:
+      process.env.NEXT_PUBLIC_API_URL || 'https://campus-teranga-backend.onrender.com/api',
     NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME || 'Campus Teranga Admin',
     NEXT_PUBLIC_APP_VERSION: process.env.NEXT_PUBLIC_APP_VERSION || '1.0.0',
     NEXT_PUBLIC_APP_ENVIRONMENT: process.env.NEXT_PUBLIC_APP_ENVIRONMENT || 'production',
@@ -38,7 +43,7 @@ const nextConfig: NextConfig = {
           },
         ],
       },
-    ];
+    ]
   },
 
   // Redirects
@@ -49,8 +54,8 @@ const nextConfig: NextConfig = {
         destination: '/landing',
         permanent: false,
       },
-    ];
+    ]
   },
-};
+}
 
-export default nextConfig;
+export default nextConfig

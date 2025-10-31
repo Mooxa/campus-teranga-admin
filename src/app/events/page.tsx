@@ -1,13 +1,13 @@
-'use client';
+'use client'
 
-import React, { useEffect, useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { adminAPI, Event } from '@/lib/api';
-import AdminLayout from '@/components/Layout/AdminLayout';
-import ProtectedRoute from '@/components/ProtectedRoute';
-import { 
-  PlusIcon, 
-  PencilIcon, 
+import React, { useEffect, useState } from 'react'
+import { useAuth } from '@/contexts/AuthContext'
+import { adminAPI, Event } from '@/lib/api'
+import AdminLayout from '@/components/Layout/AdminLayout'
+import ProtectedRoute from '@/components/ProtectedRoute'
+import {
+  PlusIcon,
+  PencilIcon,
   TrashIcon,
   EyeIcon,
   EyeSlashIcon,
@@ -17,91 +17,96 @@ import {
   EllipsisVerticalIcon,
   UserGroupIcon,
   ClockIcon,
-  SparklesIcon
-} from '@heroicons/react/24/outline';
+  SparklesIcon,
+} from '@heroicons/react/24/outline'
 
 export default function EventsPage() {
-  const { isAuthenticated, isLoading } = useAuth();
-  const [events, setEvents] = useState<Event[]>([]);
-  const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { isAuthenticated, isLoading } = useAuth()
+  const [events, setEvents] = useState<Event[]>([])
+  const [filteredEvents, setFilteredEvents] = useState<Event[]>([])
+  const [loading, setLoading] = useState(true)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_showCreateModal, setShowCreateModal] = useState(false);
+  const [_showCreateModal, setShowCreateModal] = useState(false)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_editingEvent, setEditingEvent] = useState<Event | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
-  const [sortBy, setSortBy] = useState<'date' | 'title' | 'created'>('date');
+  const [_editingEvent, setEditingEvent] = useState<Event | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all')
+  const [sortBy, setSortBy] = useState<'date' | 'title' | 'created'>('date')
 
   useEffect(() => {
     if (isAuthenticated) {
-      fetchEvents();
+      fetchEvents()
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated])
 
   // Filter and sort events
   useEffect(() => {
-    const filtered = events.filter(event => {
-      const matchesSearch = (event.title && event.title.toLowerCase().includes(searchQuery.toLowerCase())) ||
-                           (event.description && event.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
-                           (event.location && event.location.name && event.location.name.toLowerCase().includes(searchQuery.toLowerCase()));
-      
-      const matchesStatus = statusFilter === 'all' || 
-                           (statusFilter === 'active' && event.isActive) ||
-                           (statusFilter === 'inactive' && !event.isActive);
-      
-      return matchesSearch && matchesStatus;
-    });
+    const filtered = events.filter((event) => {
+      const matchesSearch =
+        (event.title && event.title.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (event.description &&
+          event.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (event.location &&
+          event.location.name &&
+          event.location.name.toLowerCase().includes(searchQuery.toLowerCase()))
+
+      const matchesStatus =
+        statusFilter === 'all' ||
+        (statusFilter === 'active' && event.isActive) ||
+        (statusFilter === 'inactive' && !event.isActive)
+
+      return matchesSearch && matchesStatus
+    })
 
     // Sort events
     filtered.sort((a, b) => {
       switch (sortBy) {
         case 'date':
-          return new Date(a.date).getTime() - new Date(b.date).getTime();
+          return new Date(a.date).getTime() - new Date(b.date).getTime()
         case 'title':
-          const aTitle = a.title || '';
-          const bTitle = b.title || '';
-          return aTitle.localeCompare(bTitle);
+          const aTitle = a.title || ''
+          const bTitle = b.title || ''
+          return aTitle.localeCompare(bTitle)
         case 'created':
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         default:
-          return 0;
+          return 0
       }
-    });
+    })
 
-    setFilteredEvents(filtered);
-  }, [events, searchQuery, statusFilter, sortBy]);
+    setFilteredEvents(filtered)
+  }, [events, searchQuery, statusFilter, sortBy])
 
   const fetchEvents = async () => {
     try {
-      const data = await adminAPI.getEvents();
-      setEvents(data);
+      const data = await adminAPI.getEvents()
+      setEvents(data)
     } catch {
       // Error handled silently
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleToggleActive = async (event: Event) => {
     try {
-      await adminAPI.updateEvent(event._id, { isActive: !event.isActive });
-      setEvents(events.map(e => e._id === event._id ? { ...e, isActive: !e.isActive } : e));
+      await adminAPI.updateEvent(event._id, { isActive: !event.isActive })
+      setEvents(events.map((e) => (e._id === event._id ? { ...e, isActive: !e.isActive } : e)))
     } catch {
       // Error handled silently
     }
-  };
+  }
 
   const handleDeleteEvent = async (eventId: string) => {
     if (confirm('Are you sure you want to delete this event?')) {
       try {
-        await adminAPI.deleteEvent(eventId);
-        setEvents(events.filter(e => e._id !== eventId));
+        await adminAPI.deleteEvent(eventId)
+        setEvents(events.filter((e) => e._id !== eventId))
       } catch {
         // Error handled silently
       }
     }
-  };
+  }
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('fr-FR', {
@@ -109,9 +114,9 @@ export default function EventsPage() {
       month: 'long',
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
+      minute: '2-digit',
+    })
+  }
 
   if (isLoading || loading) {
     return (
@@ -131,11 +136,11 @@ export default function EventsPage() {
           </div>
         </AdminLayout>
       </ProtectedRoute>
-    );
+    )
   }
 
   if (!isAuthenticated) {
-    return null;
+    return null
   }
 
   return (
@@ -152,7 +157,9 @@ export default function EventsPage() {
                   </div>
                   <div>
                     <h1 className="text-3xl font-bold text-neutral-900">Events Management</h1>
-                    <p className="text-neutral-600 mt-1">Manage and organize campus events and activities</p>
+                    <p className="text-neutral-600 mt-1">
+                      Manage and organize campus events and activities
+                    </p>
                   </div>
                 </div>
                 <button
@@ -188,7 +195,9 @@ export default function EventsPage() {
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-neutral-600">Active Events</p>
-                    <p className="text-2xl font-bold text-neutral-900">{events.filter(e => e.isActive).length}</p>
+                    <p className="text-2xl font-bold text-neutral-900">
+                      {events.filter((e) => e.isActive).length}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -199,7 +208,9 @@ export default function EventsPage() {
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-neutral-600">Inactive Events</p>
-                    <p className="text-2xl font-bold text-neutral-900">{events.filter(e => !e.isActive).length}</p>
+                    <p className="text-2xl font-bold text-neutral-900">
+                      {events.filter((e) => !e.isActive).length}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -211,7 +222,10 @@ export default function EventsPage() {
                   <div className="ml-4">
                     <p className="text-sm font-medium text-neutral-600">This Month</p>
                     <p className="text-2xl font-bold text-neutral-900">
-                      {events.filter(e => new Date(e.date).getMonth() === new Date().getMonth()).length}
+                      {
+                        events.filter((e) => new Date(e.date).getMonth() === new Date().getMonth())
+                          .length
+                      }
                     </p>
                   </div>
                 </div>
@@ -232,19 +246,21 @@ export default function EventsPage() {
                     className="w-full pl-10 pr-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
                   />
                 </div>
-                
+
                 {/* Filters */}
                 <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
                   <select
                     value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value as 'all' | 'active' | 'inactive')}
+                    onChange={(e) =>
+                      setStatusFilter(e.target.value as 'all' | 'active' | 'inactive')
+                    }
                     className="px-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
                   >
                     <option value="all">All Status</option>
                     <option value="active">Active Only</option>
                     <option value="inactive">Inactive Only</option>
                   </select>
-                  
+
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value as 'date' | 'title' | 'created')}
@@ -261,7 +277,10 @@ export default function EventsPage() {
             {/* Events Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {filteredEvents.map((event) => (
-                <div key={event._id} className="bg-white rounded-2xl shadow-sm border border-neutral-200 hover:shadow-lg transition-all duration-300 group">
+                <div
+                  key={event._id}
+                  className="bg-white rounded-2xl shadow-sm border border-neutral-200 hover:shadow-lg transition-all duration-300 group"
+                >
                   <div className="p-6">
                     {/* Header */}
                     <div className="flex items-start justify-between mb-4">
@@ -270,11 +289,13 @@ export default function EventsPage() {
                           {event.title}
                         </h3>
                         <div className="flex items-center mt-2">
-                          <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                            event.isActive 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-red-100 text-red-800'
-                          }`}>
+                          <span
+                            className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                              event.isActive
+                                ? 'bg-green-100 text-green-800'
+                                : 'bg-red-100 text-red-800'
+                            }`}
+                          >
                             {event.isActive ? 'Active' : 'Inactive'}
                           </span>
                         </div>
@@ -285,7 +306,7 @@ export default function EventsPage() {
                         </button>
                       </div>
                     </div>
-                    
+
                     {/* Description */}
                     <p className="text-neutral-600 text-sm line-clamp-3 mb-4">
                       {event.description}
@@ -299,7 +320,9 @@ export default function EventsPage() {
                       </div>
                       <div className="flex items-center text-sm text-neutral-500">
                         <MapPinIcon className="h-4 w-4 mr-3 text-orange-500" />
-                        <span>{event.location.name}, {event.location.city}</span>
+                        <span>
+                          {event.location.name}, {event.location.city}
+                        </span>
                       </div>
                       <div className="flex items-center text-sm text-neutral-500">
                         <UserGroupIcon className="h-4 w-4 mr-3 text-orange-500" />
@@ -361,11 +384,11 @@ export default function EventsPage() {
                   {searchQuery || statusFilter !== 'all' ? 'No events found' : 'No events yet'}
                 </h3>
                 <p className="text-neutral-600 mb-6">
-                  {searchQuery || statusFilter !== 'all' 
-                    ? 'Try adjusting your search or filter criteria.' 
+                  {searchQuery || statusFilter !== 'all'
+                    ? 'Try adjusting your search or filter criteria.'
                     : 'Get started by creating your first event.'}
                 </p>
-                {(!searchQuery && statusFilter === 'all') && (
+                {!searchQuery && statusFilter === 'all' && (
                   <button
                     onClick={() => setShowCreateModal(true)}
                     className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
@@ -380,5 +403,5 @@ export default function EventsPage() {
         </div>
       </AdminLayout>
     </ProtectedRoute>
-  );
+  )
 }

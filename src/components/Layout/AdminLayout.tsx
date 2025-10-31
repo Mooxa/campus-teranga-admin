@@ -1,11 +1,11 @@
-'use client';
+'use client'
 
-import React from 'react';
-import Sidebar from './Sidebar';
-import Header from './Header';
+import React from 'react'
+import Sidebar from './Sidebar'
+import Header from './Header'
 
 interface AdminLayoutProps {
-  children: React.ReactNode;
+  children: React.ReactNode
 }
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
@@ -14,10 +14,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header />
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-neutral-50">
-          {children}
-        </main>
+        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-neutral-50">{children}</main>
       </div>
     </div>
-  );
+  )
 }

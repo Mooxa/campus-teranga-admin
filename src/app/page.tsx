@@ -1,29 +1,29 @@
-'use client';
+'use client'
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { useAuth } from '@/contexts/AuthContext'
 
 export default function HomePage() {
-  const { isAuthenticated, isLoading, user } = useAuth();
-  const router = useRouter();
+  const { isAuthenticated, isLoading, user } = useAuth()
+  const router = useRouter()
 
   useEffect(() => {
     if (!isLoading) {
       if (isAuthenticated && user) {
         // Redirect based on user role
         if (user.role === 'admin' || user.role === 'super_admin') {
-          router.replace('/dashboard');
+          router.replace('/dashboard')
         } else {
           // Regular users go to home page to browse formations/events/services
-          router.replace('/home');
+          router.replace('/home')
         }
       } else {
         // User is not authenticated, redirect to landing page
-        router.replace('/landing');
+        router.replace('/landing')
       }
     }
-  }, [isAuthenticated, isLoading, user, router]);
+  }, [isAuthenticated, isLoading, user, router])
 
   // Show loading spinner while checking authentication
   if (isLoading) {
@@ -40,9 +40,9 @@ export default function HomePage() {
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   // This should not render as we redirect immediately
-  return null;
+  return null
 }

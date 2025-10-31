@@ -1,9 +1,9 @@
-'use client';
+'use client'
 
-import React from 'react';
-import AdminLayout from '@/components/Layout/AdminLayout';
-import ProtectedRoute from '@/components/ProtectedRoute';
-import { ChartBarIcon } from '@heroicons/react/24/outline';
+import React from 'react'
+import AdminLayout from '@/components/Layout/AdminLayout'
+import ProtectedRoute from '@/components/ProtectedRoute'
+import { ChartBarIcon } from '@heroicons/react/24/outline'
 
 export default function AnalyticsPage() {
   return (
@@ -12,9 +12,7 @@ export default function AnalyticsPage() {
         <div className="space-y-6">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Analytics</h1>
-            <p className="mt-2 text-gray-600">
-              Platform analytics and insights
-            </p>
+            <p className="mt-2 text-gray-600">Platform analytics and insights</p>
           </div>
 
           <div className="bg-white shadow rounded-lg p-6">
@@ -29,5 +27,5 @@ export default function AnalyticsPage() {
         </div>
       </AdminLayout>
     </ProtectedRoute>
-  );
+  )
 }

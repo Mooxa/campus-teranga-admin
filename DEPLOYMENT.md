@@ -13,6 +13,7 @@ This guide will help you deploy the Campus Teranga admin dashboard to Vercel wit
 ### 1. Prepare Your Repository
 
 Ensure your admin dashboard code is pushed to GitHub with the following structure:
+
 ```
 campus_teranga_admin/
 ├── src/
@@ -25,6 +26,7 @@ campus_teranga_admin/
 ### 2. Deploy to Vercel
 
 #### Option A: Using Vercel Dashboard (Recommended)
+
 1. Go to [vercel.com](https://vercel.com) and sign in
 2. Click "New Project"
 3. Import your GitHub repository
@@ -36,6 +38,7 @@ campus_teranga_admin/
    - **Output Directory**: `.next`
 
 #### Option B: Using Vercel CLI
+
 ```bash
 # Install Vercel CLI
 npm i -g vercel
@@ -54,18 +57,19 @@ vercel
 
 Set these environment variables in Vercel dashboard:
 
-| Variable | Value | Description |
-|----------|-------|-------------|
-| `NEXT_PUBLIC_API_URL` | `https://campus-teranga-backend.onrender.com/api` | Production API endpoint |
-| `NEXT_PUBLIC_APP_NAME` | `Campus Teranga Admin` | Application name |
-| `NEXT_PUBLIC_APP_VERSION` | `1.0.0` | Application version |
-| `NEXT_PUBLIC_APP_ENVIRONMENT` | `production` | Environment mode |
-| `NEXT_PUBLIC_ADMIN_DOMAIN` | `campus-teranga-admin.vercel.app` | Admin domain |
-| `NEXT_PUBLIC_BACKEND_DOMAIN` | `campus-teranga-backend.onrender.com` | Backend domain |
+| Variable                      | Value                                             | Description             |
+| ----------------------------- | ------------------------------------------------- | ----------------------- |
+| `NEXT_PUBLIC_API_URL`         | `https://campus-teranga-backend.onrender.com/api` | Production API endpoint |
+| `NEXT_PUBLIC_APP_NAME`        | `Campus Teranga Admin`                            | Application name        |
+| `NEXT_PUBLIC_APP_VERSION`     | `1.0.0`                                           | Application version     |
+| `NEXT_PUBLIC_APP_ENVIRONMENT` | `production`                                      | Environment mode        |
+| `NEXT_PUBLIC_ADMIN_DOMAIN`    | `campus-teranga-admin.vercel.app`                 | Admin domain            |
+| `NEXT_PUBLIC_BACKEND_DOMAIN`  | `campus-teranga-backend.onrender.com`             | Backend domain          |
 
 ### 4. Domain Configuration
 
 Vercel will automatically provide:
+
 - **Preview URL**: `https://campus-teranga-admin-git-main.vercel.app`
 - **Production URL**: `https://campus-teranga-admin.vercel.app`
 
@@ -74,6 +78,7 @@ You can also add a custom domain if needed.
 ### 5. Backend CORS Configuration
 
 The backend has been configured to allow requests from:
+
 - `https://campus-teranga-admin.vercel.app`
 - `https://campus-teranga-admin-git-main.vercel.app`
 - `https://campus-teranga-admin-git-develop.vercel.app`
@@ -81,22 +86,29 @@ The backend has been configured to allow requests from:
 ## Testing the Deployment
 
 ### 1. Health Check
+
 Visit your deployed admin dashboard and check:
+
 - ✅ Dashboard loads without errors
 - ✅ Login page is accessible
 - ✅ API calls are working
 
 ### 2. Admin Login
+
 Use the seeded admin credentials:
+
 - **Phone**: `+221771234568`
 - **Password**: `admin123`
 
 Or Super Admin:
+
 - **Phone**: `+221771234569`
 - **Password**: `superadmin123`
 
 ### 3. API Connectivity
+
 Test the connection to your backend:
+
 ```bash
 curl https://campus-teranga-admin.vercel.app/api/health
 ```
@@ -106,27 +118,32 @@ curl https://campus-teranga-admin.vercel.app/api/health
 Once deployed, your admin dashboard will have:
 
 ### 📊 Dashboard
+
 - User statistics and analytics
 - Recent user registrations
 - System overview
 
 ### 👥 User Management
+
 - View all users
 - Create new users
 - Edit user profiles
 - Deactivate/activate users
 
 ### 🎉 Event Management
+
 - Create and manage events
 - View event registrations
 - Update event details
 
 ### 🏫 Formation Management
+
 - Manage university formations
 - Add new programs
 - Update formation details
 
 ### 🚌 Service Management
+
 - Manage services (transport, housing, etc.)
 - Add new services
 - Update service information
@@ -182,6 +199,7 @@ Once deployed, your admin dashboard will have:
 ## Support
 
 For issues with this deployment:
+
 1. Check Vercel documentation: [vercel.com/docs](https://vercel.com/docs)
 2. Review Next.js deployment guide: [nextjs.org/docs/deployment](https://nextjs.org/docs/deployment)
 3. Check backend API status: [https://campus-teranga-backend.onrender.com/health](https://campus-teranga-backend.onrender.com/health)
@@ -189,6 +207,7 @@ For issues with this deployment:
 ## Next Steps
 
 After successful deployment:
+
 1. **Test all features** thoroughly
 2. **Set up monitoring** and alerts
 3. **Configure custom domain** if needed

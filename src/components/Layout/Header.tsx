@@ -1,39 +1,45 @@
-'use client';
+'use client'
 
-import React, { useState, useRef, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useRouter } from 'next/navigation';
-import { BellIcon, MagnifyingGlassIcon, UserIcon, ArrowRightOnRectangleIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
+import React, { useState, useRef, useEffect } from 'react'
+import { useAuth } from '@/contexts/AuthContext'
+import { useRouter } from 'next/navigation'
+import {
+  BellIcon,
+  MagnifyingGlassIcon,
+  UserIcon,
+  ArrowRightOnRectangleIcon,
+  ChevronDownIcon,
+} from '@heroicons/react/24/outline'
 
 export default function Header() {
-  const { user, logout } = useAuth();
-  const router = useRouter();
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const { user, logout } = useAuth()
+  const router = useRouter()
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
 
   // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsDropdownOpen(false);
+        setIsDropdownOpen(false)
       }
     }
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside)
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
 
   const handleEditProfile = () => {
-    setIsDropdownOpen(false);
-    router.push('/profile/edit');
-  };
+    setIsDropdownOpen(false)
+    router.push('/profile/edit')
+  }
 
   const handleLogout = () => {
-    setIsDropdownOpen(false);
-    logout();
-  };
+    setIsDropdownOpen(false)
+    logout()
+  }
 
   return (
     <header className="bg-neutral-0 border-b border-neutral-200">
@@ -77,7 +83,9 @@ export default function Header() {
                 <div className="font-medium text-neutral-900">{user?.fullName}</div>
                 <div className="text-neutral-500 capitalize">{user?.role?.replace('_', ' ')}</div>
               </div>
-              <ChevronDownIcon className={`w-4 h-4 text-neutral-400 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+              <ChevronDownIcon
+                className={`w-4 h-4 text-neutral-400 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`}
+              />
             </button>
 
             {/* Dropdown Menu */}
@@ -96,7 +104,7 @@ export default function Header() {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="py-2">
                   <button
                     onClick={handleEditProfile}
@@ -105,7 +113,7 @@ export default function Header() {
                     <UserIcon className="w-5 h-5 mr-3 text-neutral-400" />
                     <span>Modifier le profil</span>
                   </button>
-                  
+
                   <button
                     onClick={handleLogout}
                     className="flex items-center w-full px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors duration-200"
@@ -120,5 +128,5 @@ export default function Header() {
         </div>
       </div>
     </header>
-  );
+  )
 }

@@ -1,59 +1,59 @@
-'use client';
+'use client'
 
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
-import { ArrowLeftIcon } from '@heroicons/react/24/outline';
+import React, { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { useAuth } from '@/contexts/AuthContext'
+import { ArrowLeftIcon } from '@heroicons/react/24/outline'
 
 export default function LoginPage() {
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  
-  const { login, isAuthenticated, user, isLoading: authLoading } = useAuth();
-  const router = useRouter();
+  const [phoneNumber, setPhoneNumber] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+
+  const { login, isAuthenticated, user, isLoading: authLoading } = useAuth()
+  const router = useRouter()
 
   useEffect(() => {
     if (isAuthenticated && user) {
       // Redirect based on user role
       if (user.role === 'admin' || user.role === 'super_admin') {
-        router.push('/dashboard');
+        router.push('/dashboard')
       } else {
-        router.push('/home');
+        router.push('/home')
       }
     }
-  }, [isAuthenticated, user, router]);
+  }, [isAuthenticated, user, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setIsLoading(true);
+    e.preventDefault()
+    setError('')
+    setIsLoading(true)
 
     try {
-      const loggedInUser = await login(phoneNumber, password);
-      
+      const loggedInUser = await login(phoneNumber, password)
+
       // Redirect based on user role
       setTimeout(() => {
         if (loggedInUser.role === 'admin' || loggedInUser.role === 'super_admin') {
-          router.push('/dashboard');
+          router.push('/dashboard')
         } else {
-          router.push('/home');
+          router.push('/home')
         }
-      }, 100);
+      }, 100)
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Login failed');
+      setError(err instanceof Error ? err.message : 'Login failed')
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-neutral-50">
         <div className="animate-spin rounded-full h-12 w-12 border-2 border-orange-200 border-t-orange-500"></div>
       </div>
-    );
+    )
   }
 
   return (
@@ -73,20 +73,19 @@ export default function LoginPage() {
           <div className="mx-auto h-16 w-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg">
             <span className="text-2xl font-bold text-white">CT</span>
           </div>
-          <h2 className="mt-6 text-3xl font-bold text-neutral-900">
-            Welcome back
-          </h2>
-          <p className="mt-2 text-sm text-neutral-600">
-            Sign in to your admin dashboard
-          </p>
+          <h2 className="mt-6 text-3xl font-bold text-neutral-900">Welcome back</h2>
+          <p className="mt-2 text-sm text-neutral-600">Sign in to your admin dashboard</p>
         </div>
-        
+
         {/* Login Form */}
         <div className="bg-neutral-0 rounded-2xl shadow-soft border border-neutral-200 p-8">
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div className="space-y-4">
               <div>
-                <label htmlFor="phoneNumber" className="block text-sm font-medium text-neutral-700 mb-2">
+                <label
+                  htmlFor="phoneNumber"
+                  className="block text-sm font-medium text-neutral-700 mb-2"
+                >
                   Phone Number
                 </label>
                 <input
@@ -100,9 +99,12 @@ export default function LoginPage() {
                   onChange={(e) => setPhoneNumber(e.target.value)}
                 />
               </div>
-              
+
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-neutral-700 mb-2">
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-neutral-700 mb-2"
+                >
                   Password
                 </label>
                 <input
@@ -121,7 +123,11 @@ export default function LoginPage() {
             {error && (
               <div className="bg-error-50 border border-error-200 text-error-700 px-4 py-3 rounded-xl text-sm flex items-center">
                 <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  <path
+                    fillRule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
                 </svg>
                 {error}
               </div>
@@ -146,12 +152,13 @@ export default function LoginPage() {
           {/* Test Credentials */}
           <div className="mt-6 p-4 bg-neutral-50 rounded-xl">
             <p className="text-xs text-neutral-600 text-center">
-              <span className="font-medium">Test credentials:</span><br />
+              <span className="font-medium">Test credentials:</span>
+              <br />
               +221771234568 / admin123
             </p>
           </div>
         </div>
       </div>
     </div>
-  );
+  )
 }

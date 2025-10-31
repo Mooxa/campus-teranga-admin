@@ -1,13 +1,13 @@
-'use client';
+'use client'
 
-import React, { useEffect, useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { adminAPI, Service } from '@/lib/api';
-import AdminLayout from '@/components/Layout/AdminLayout';
-import ProtectedRoute from '@/components/ProtectedRoute';
-import { 
-  PlusIcon, 
-  PencilIcon, 
+import React, { useEffect, useState } from 'react'
+import { useAuth } from '@/contexts/AuthContext'
+import { adminAPI, Service } from '@/lib/api'
+import AdminLayout from '@/components/Layout/AdminLayout'
+import ProtectedRoute from '@/components/ProtectedRoute'
+import {
+  PlusIcon,
+  PencilIcon,
   TrashIcon,
   EyeIcon,
   EyeSlashIcon,
@@ -17,93 +17,98 @@ import {
   EllipsisVerticalIcon,
   SparklesIcon,
   WrenchScrewdriverIcon,
-  GlobeAltIcon
-} from '@heroicons/react/24/outline';
+  GlobeAltIcon,
+} from '@heroicons/react/24/outline'
 
 export default function ServicesPage() {
-  const { isAuthenticated, isLoading } = useAuth();
-  const [services, setServices] = useState<Service[]>([]);
-  const [filteredServices, setFilteredServices] = useState<Service[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [editingService, setEditingService] = useState<Service | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState<string>('all');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
-  const [sortBy, setSortBy] = useState<'title' | 'category' | 'created'>('title');
+  const { isAuthenticated, isLoading } = useAuth()
+  const [services, setServices] = useState<Service[]>([])
+  const [filteredServices, setFilteredServices] = useState<Service[]>([])
+  const [loading, setLoading] = useState(true)
+  const [showCreateModal, setShowCreateModal] = useState(false)
+  const [editingService, setEditingService] = useState<Service | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState<string>('all')
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all')
+  const [sortBy, setSortBy] = useState<'title' | 'category' | 'created'>('title')
 
   useEffect(() => {
     if (isAuthenticated) {
-      fetchServices();
+      fetchServices()
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated])
 
   // Filter and sort services
   useEffect(() => {
-    const filtered = services.filter(service => {
-      const matchesSearch = (service.title && service.title.toLowerCase().includes(searchQuery.toLowerCase())) ||
-                           (service.description && service.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
-                           (service.category && service.category.toLowerCase().includes(searchQuery.toLowerCase()));
-      
-      const matchesCategory = categoryFilter === 'all' || service.category === categoryFilter;
-      const matchesStatus = statusFilter === 'all' || 
-                           (statusFilter === 'active' && service.isActive) ||
-                           (statusFilter === 'inactive' && !service.isActive);
-      
-      return matchesSearch && matchesCategory && matchesStatus;
-    });
+    const filtered = services.filter((service) => {
+      const matchesSearch =
+        (service.title && service.title.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (service.description &&
+          service.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (service.category && service.category.toLowerCase().includes(searchQuery.toLowerCase()))
+
+      const matchesCategory = categoryFilter === 'all' || service.category === categoryFilter
+      const matchesStatus =
+        statusFilter === 'all' ||
+        (statusFilter === 'active' && service.isActive) ||
+        (statusFilter === 'inactive' && !service.isActive)
+
+      return matchesSearch && matchesCategory && matchesStatus
+    })
 
     // Sort services
     filtered.sort((a, b) => {
       switch (sortBy) {
         case 'title':
-          const aTitle = a.title || '';
-          const bTitle = b.title || '';
-          return aTitle.localeCompare(bTitle);
+          const aTitle = a.title || ''
+          const bTitle = b.title || ''
+          return aTitle.localeCompare(bTitle)
         case 'category':
-          const aCategory = a.category || '';
-          const bCategory = b.category || '';
-          return aCategory.localeCompare(bCategory);
+          const aCategory = a.category || ''
+          const bCategory = b.category || ''
+          return aCategory.localeCompare(bCategory)
         case 'created':
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         default:
-          return 0;
+          return 0
       }
-    });
+    })
 
-    setFilteredServices(filtered);
-  }, [services, searchQuery, categoryFilter, statusFilter, sortBy]);
+    setFilteredServices(filtered)
+  }, [services, searchQuery, categoryFilter, statusFilter, sortBy])
 
   const fetchServices = async () => {
     try {
-      const data = await adminAPI.getServices();
-      setServices(data);
+      const data = await adminAPI.getServices()
+      setServices(data)
     } catch {
       // Error handled silently
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleToggleActive = async (service: Service) => {
     try {
-      await adminAPI.updateService(service._id, { isActive: !service.isActive });
-      setServices(services.map(s => s._id === service._id ? { ...s, isActive: !s.isActive } : s));
+      await adminAPI.updateService(service._id, { isActive: !service.isActive })
+      setServices(
+        services.map((s) => (s._id === service._id ? { ...s, isActive: !s.isActive } : s))
+      )
     } catch {
       // Error handled silently
     }
-  };
+  }
 
   const handleDeleteService = async (serviceId: string) => {
     if (confirm('Are you sure you want to delete this service?')) {
       try {
-        await adminAPI.deleteService(serviceId);
-        setServices(services.filter(s => s._id !== serviceId));
+        await adminAPI.deleteService(serviceId)
+        setServices(services.filter((s) => s._id !== serviceId))
       } catch {
         // Error handled silently
       }
     }
-  };
+  }
 
   if (isLoading || loading) {
     return (
@@ -123,15 +128,15 @@ export default function ServicesPage() {
           </div>
         </AdminLayout>
       </ProtectedRoute>
-    );
+    )
   }
 
   if (!isAuthenticated) {
-    return null;
+    return null
   }
 
   // Get unique categories for filter
-  const categories = Array.from(new Set(services.map(s => s.category)));
+  const categories = Array.from(new Set(services.map((s) => s.category)))
 
   return (
     <ProtectedRoute>
@@ -183,7 +188,9 @@ export default function ServicesPage() {
                   </div>
                   <div className="ml-4">
                     <p className="text-sm font-medium text-neutral-600">Active Services</p>
-                    <p className="text-2xl font-bold text-neutral-900">{services.filter(s => s.isActive).length}</p>
+                    <p className="text-2xl font-bold text-neutral-900">
+                      {services.filter((s) => s.isActive).length}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -206,7 +213,11 @@ export default function ServicesPage() {
                   <div className="ml-4">
                     <p className="text-sm font-medium text-neutral-600">This Month</p>
                     <p className="text-2xl font-bold text-neutral-900">
-                      {services.filter(s => new Date(s.createdAt).getMonth() === new Date().getMonth()).length}
+                      {
+                        services.filter(
+                          (s) => new Date(s.createdAt).getMonth() === new Date().getMonth()
+                        ).length
+                      }
                     </p>
                   </div>
                 </div>
@@ -227,7 +238,7 @@ export default function ServicesPage() {
                     className="w-full pl-10 pr-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
                   />
                 </div>
-                
+
                 {/* Filters */}
                 <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
                   <select
@@ -236,21 +247,25 @@ export default function ServicesPage() {
                     className="px-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
                   >
                     <option value="all">All Categories</option>
-                    {categories.map(category => (
-                      <option key={category} value={category}>{category}</option>
+                    {categories.map((category) => (
+                      <option key={category} value={category}>
+                        {category}
+                      </option>
                     ))}
                   </select>
-                  
+
                   <select
                     value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value as 'all' | 'active' | 'inactive')}
+                    onChange={(e) =>
+                      setStatusFilter(e.target.value as 'all' | 'active' | 'inactive')
+                    }
                     className="px-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
                   >
                     <option value="all">All Status</option>
                     <option value="active">Active Only</option>
                     <option value="inactive">Inactive Only</option>
                   </select>
-                  
+
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value as 'title' | 'category' | 'created')}
@@ -267,7 +282,10 @@ export default function ServicesPage() {
             {/* Services Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {filteredServices.map((service) => (
-                <div key={service._id} className="bg-white rounded-2xl shadow-sm border border-neutral-200 hover:shadow-lg transition-all duration-300 group">
+                <div
+                  key={service._id}
+                  className="bg-white rounded-2xl shadow-sm border border-neutral-200 hover:shadow-lg transition-all duration-300 group"
+                >
                   <div className="p-6">
                     {/* Header */}
                     <div className="flex items-start justify-between mb-4">
@@ -276,11 +294,13 @@ export default function ServicesPage() {
                           {service.title}
                         </h3>
                         <div className="flex items-center mt-2 space-x-2">
-                          <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                            service.isActive 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-red-100 text-red-800'
-                          }`}>
+                          <span
+                            className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                              service.isActive
+                                ? 'bg-green-100 text-green-800'
+                                : 'bg-red-100 text-red-800'
+                            }`}
+                          >
                             {service.isActive ? 'Active' : 'Inactive'}
                           </span>
                           <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
@@ -294,7 +314,7 @@ export default function ServicesPage() {
                         </button>
                       </div>
                     </div>
-                    
+
                     {/* Description */}
                     <p className="text-neutral-600 text-sm line-clamp-3 mb-6">
                       {service.description}
@@ -357,14 +377,16 @@ export default function ServicesPage() {
                   <CogIcon className="h-12 w-12 text-orange-600" />
                 </div>
                 <h3 className="text-xl font-semibold text-neutral-900 mb-2">
-                  {searchQuery || categoryFilter !== 'all' || statusFilter !== 'all' ? 'No services found' : 'No services yet'}
+                  {searchQuery || categoryFilter !== 'all' || statusFilter !== 'all'
+                    ? 'No services found'
+                    : 'No services yet'}
                 </h3>
                 <p className="text-neutral-600 mb-6">
-                  {searchQuery || categoryFilter !== 'all' || statusFilter !== 'all' 
-                    ? 'Try adjusting your search or filter criteria.' 
+                  {searchQuery || categoryFilter !== 'all' || statusFilter !== 'all'
+                    ? 'Try adjusting your search or filter criteria.'
                     : 'Get started by creating your first service.'}
                 </p>
-                {(!searchQuery && categoryFilter === 'all' && statusFilter === 'all') && (
+                {!searchQuery && categoryFilter === 'all' && statusFilter === 'all' && (
                   <button
                     onClick={() => setShowCreateModal(true)}
                     className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
@@ -390,7 +412,12 @@ export default function ServicesPage() {
                     className="p-2 text-neutral-400 hover:text-neutral-600 rounded-lg hover:bg-neutral-100 transition-colors duration-200"
                   >
                     <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     </svg>
                   </button>
                 </div>
@@ -399,9 +426,9 @@ export default function ServicesPage() {
                 <ServiceForm
                   onSubmit={async (serviceData) => {
                     try {
-                      await adminAPI.createService(serviceData);
-                      setShowCreateModal(false);
-                      fetchServices();
+                      await adminAPI.createService(serviceData)
+                      setShowCreateModal(false)
+                      fetchServices()
                     } catch {
                       // Error handled silently
                     }
@@ -425,7 +452,12 @@ export default function ServicesPage() {
                     className="p-2 text-neutral-400 hover:text-neutral-600 rounded-lg hover:bg-neutral-100 transition-colors duration-200"
                   >
                     <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     </svg>
                   </button>
                 </div>
@@ -435,9 +467,9 @@ export default function ServicesPage() {
                   service={editingService}
                   onSubmit={async (serviceData) => {
                     try {
-                      await adminAPI.updateService(editingService._id, serviceData);
-                      setEditingService(null);
-                      fetchServices();
+                      await adminAPI.updateService(editingService._id, serviceData)
+                      setEditingService(null)
+                      fetchServices()
                     } catch {
                       // Error handled silently
                     }
@@ -450,14 +482,14 @@ export default function ServicesPage() {
         )}
       </AdminLayout>
     </ProtectedRoute>
-  );
+  )
 }
 
 // Service Form Component
 interface ServiceFormProps {
-  service?: Service;
-  onSubmit: (data: Partial<Service>) => void;
-  onCancel: () => void;
+  service?: Service
+  onSubmit: (data: Partial<Service>) => void
+  onCancel: () => void
 }
 
 function ServiceForm({ service, onSubmit, onCancel }: ServiceFormProps) {
@@ -466,21 +498,19 @@ function ServiceForm({ service, onSubmit, onCancel }: ServiceFormProps) {
     description: service?.description || '',
     category: service?.category || 'transport',
     isActive: service?.isActive ?? true,
-  });
+  })
 
-  const categories = ['transport', 'housing', 'procedures', 'health', 'other'];
+  const categories = ['transport', 'housing', 'procedures', 'health', 'other']
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit(formData);
-  };
+    e.preventDefault()
+    onSubmit(formData)
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
-        <label className="block text-sm font-medium text-neutral-700 mb-2">
-          Service Title *
-        </label>
+        <label className="block text-sm font-medium text-neutral-700 mb-2">Service Title *</label>
         <input
           type="text"
           value={formData.title}
@@ -492,9 +522,7 @@ function ServiceForm({ service, onSubmit, onCancel }: ServiceFormProps) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-neutral-700 mb-2">
-          Description *
-        </label>
+        <label className="block text-sm font-medium text-neutral-700 mb-2">Description *</label>
         <textarea
           value={formData.description}
           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -506,16 +534,14 @@ function ServiceForm({ service, onSubmit, onCancel }: ServiceFormProps) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-neutral-700 mb-2">
-          Category *
-        </label>
+        <label className="block text-sm font-medium text-neutral-700 mb-2">Category *</label>
         <select
           value={formData.category}
           onChange={(e) => setFormData({ ...formData, category: e.target.value })}
           className="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
           required
         >
-          {categories.map(category => (
+          {categories.map((category) => (
             <option key={category} value={category}>
               {category.charAt(0).toUpperCase() + category.slice(1)}
             </option>
@@ -552,5 +578,5 @@ function ServiceForm({ service, onSubmit, onCancel }: ServiceFormProps) {
         </button>
       </div>
     </form>
-  );
+  )
 }

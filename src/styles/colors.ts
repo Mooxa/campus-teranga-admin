@@ -13,7 +13,7 @@ export const colors = {
     800: '#7C2D12',
     900: '#431407',
   },
-  
+
   // Neutral colors - Clean minimal grays
   neutral: {
     0: '#FFFFFF',
@@ -29,9 +29,9 @@ export const colors = {
     900: '#171717',
     950: '#0A0A0A',
   },
-  
+
   // Dark theme colors removed - light theme only
-  
+
   // Accent colors - Modern minimal palette
   accent: {
     blue: '#3B82F6',
@@ -41,7 +41,7 @@ export const colors = {
     purple: '#8B5CF6',
     pink: '#EC4899',
   },
-  
+
   // Semantic colors - Clean status indicators
   success: {
     50: '#ECFDF5',
@@ -71,14 +71,14 @@ export const colors = {
     600: '#2563EB',
     700: '#1D4ED8',
   },
-  
+
   // Background colors - light theme only
   background: {
     primary: '#FFFFFF',
     secondary: '#FAFAFA',
     tertiary: '#F5F5F5',
   },
-  
+
   // Text colors
   text: {
     primary: '#171717',
@@ -87,14 +87,14 @@ export const colors = {
     inverse: '#FFFFFF',
     disabled: '#A3A3A3',
   },
-  
+
   // Border colors
   border: {
     light: '#E5E5E5',
     medium: '#D4D4D4',
     dark: '#A3A3A3',
   },
-  
+
   // Shadow colors
   shadow: {
     sm: 'rgba(0, 0, 0, 0.05)',
@@ -102,6 +102,6 @@ export const colors = {
     lg: 'rgba(0, 0, 0, 0.15)',
     xl: 'rgba(0, 0, 0, 0.2)',
   },
-} as const;
+} as const
 
-export type ColorKey = keyof typeof colors;
+export type ColorKey = keyof typeof colors

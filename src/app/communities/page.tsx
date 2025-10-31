@@ -1,60 +1,56 @@
-'use client';
+'use client'
 
-import React, { useEffect, useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useRouter } from 'next/navigation';
-import { communityAPI, Community } from '@/lib/api';
-import { 
-  UsersIcon,
-  PlusIcon,
-  UserGroupIcon,
-  CheckCircleIcon
-} from '@heroicons/react/24/outline';
+import React, { useEffect, useState } from 'react'
+import { useAuth } from '@/contexts/AuthContext'
+import { useRouter } from 'next/navigation'
+import { communityAPI, Community } from '@/lib/api'
+import { UsersIcon, PlusIcon, UserGroupIcon, CheckCircleIcon } from '@heroicons/react/24/outline'
 
 export default function CommunitiesPage() {
-  const { user, isAuthenticated } = useAuth();
-  const router = useRouter();
-  const [communities, setCommunities] = useState<Community[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { user, isAuthenticated } = useAuth()
+  const router = useRouter()
+  const [communities, setCommunities] = useState<Community[]>([])
+  const [loading, setLoading] = useState(true)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_selectedCommunity, setSelectedCommunity] = useState<Community | null>(null);
+  const [_selectedCommunity, setSelectedCommunity] = useState<Community | null>(null)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_showCreateModal, setShowCreateModal] = useState(false);
+  const [_showCreateModal, setShowCreateModal] = useState(false)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_showJoinModal, setShowJoinModal] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [_showJoinModal, setShowJoinModal] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState<string>('all')
 
   // Redirect if not authenticated
   useEffect(() => {
     if (!isAuthenticated) {
-      router.push('/login');
+      router.push('/login')
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, router])
 
   useEffect(() => {
     if (isAuthenticated) {
-      fetchCommunities();
+      fetchCommunities()
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated])
 
   const fetchCommunities = async () => {
     try {
-      const data = await communityAPI.getCommunities();
-      setCommunities(Array.isArray(data) ? data : []);
+      const data = await communityAPI.getCommunities()
+      setCommunities(Array.isArray(data) ? data : [])
     } catch {
       // Error handled silently
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
-  const filteredCommunities = communities.filter(community => {
-    const matchesSearch = community.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         community.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || community.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
+  const filteredCommunities = communities.filter((community) => {
+    const matchesSearch =
+      community.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      community.description.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesCategory = selectedCategory === 'all' || community.category === selectedCategory
+    return matchesSearch && matchesCategory
+  })
 
   if (!isAuthenticated || loading) {
     return (
@@ -68,7 +64,7 @@ export default function CommunitiesPage() {
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -78,9 +74,7 @@ export default function CommunitiesPage() {
         <div className="mb-12">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h1 className="text-4xl font-bold text-neutral-900 mb-2">
-                Communautés
-              </h1>
+              <h1 className="text-4xl font-bold text-neutral-900 mb-2">Communautés</h1>
               <p className="text-lg text-neutral-600">
                 Rejoignez des communautés et échangez avec d&apos;autres étudiants
               </p>
@@ -125,7 +119,7 @@ export default function CommunitiesPage() {
         {/* Communities Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredCommunities.map((community) => {
-            const isMember = community.members.some(m => m.user._id === user?._id);
+            const isMember = community.members.some((m) => m.user._id === user?._id)
             return (
               <div
                 key={community._id}
@@ -134,7 +128,11 @@ export default function CommunitiesPage() {
                 {community.image && (
                   <div className="h-48 bg-gradient-to-br from-orange-100 to-orange-200">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={community.image} alt={community.name} className="w-full h-full object-cover" />
+                    <img
+                      src={community.image}
+                      alt={community.name}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                 )}
                 <div className="p-6">
@@ -147,24 +145,22 @@ export default function CommunitiesPage() {
                         {community.category}
                       </span>
                     </div>
-                    {isMember && (
-                      <CheckCircleIcon className="h-6 w-6 text-green-500" />
-                    )}
+                    {isMember && <CheckCircleIcon className="h-6 w-6 text-green-500" />}
                   </div>
-                  
+
                   <p className="text-neutral-600 text-sm mb-4 line-clamp-2">
                     {community.description}
                   </p>
-                  
+
                   <div className="flex items-center text-sm text-neutral-500 mb-4">
                     <UserGroupIcon className="h-4 w-4 mr-2" />
                     <span>{community.members.length} membre(s)</span>
                   </div>
-                  
+
                   <button
                     onClick={() => {
-                      setSelectedCommunity(community);
-                      setShowJoinModal(true);
+                      setSelectedCommunity(community)
+                      setShowJoinModal(true)
                     }}
                     className={`w-full py-2 px-4 rounded-xl font-semibold transition-all duration-200 ${
                       isMember
@@ -176,7 +172,7 @@ export default function CommunitiesPage() {
                   </button>
                 </div>
               </div>
-            );
+            )
           })}
         </div>
 
@@ -187,12 +183,11 @@ export default function CommunitiesPage() {
               Aucune communauté trouvée
             </h3>
             <p className="text-neutral-600">
-              {searchQuery ? 'Essayez avec d\'autres mots-clés' : 'Créez votre première communauté'}
+              {searchQuery ? "Essayez avec d'autres mots-clés" : 'Créez votre première communauté'}
             </p>
           </div>
         )}
       </div>
     </div>
-  );
+  )
 }
-

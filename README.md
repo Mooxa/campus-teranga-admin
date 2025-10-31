@@ -24,28 +24,32 @@ A modern Next.js web application for managing the Campus Téranga platform.
 
 ### Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - npm or yarn
 - Campus Téranga Backend running on port 3000
 
 ### Installation
 
 1. Install dependencies:
+
 ```bash
 npm install
 ```
 
 2. Create environment file:
+
 ```bash
 cp .env.example .env.local
 ```
 
 3. Update `.env.local` with your API URL:
+
 ```
 NEXT_PUBLIC_API_URL=http://localhost:3000/api
 ```
 
 4. Start the development server:
+
 ```bash
 npm run dev
 ```
@@ -57,34 +61,40 @@ npm run dev
 ### Login
 
 Use the admin credentials to access the dashboard:
+
 - **Phone**: +221771234568
 - **Password**: admin123
 
 ### Features
 
 #### Dashboard
+
 - View platform statistics
 - Monitor recent user activity
 - Quick access to management sections
 
 #### User Management
+
 - View all registered users
 - Toggle user active/inactive status
 - Edit user information
 - Delete user accounts
 
 #### Event Management
+
 - Create and manage events
 - Set event details (title, description, date, location)
 - Manage event organizers
 - Toggle event visibility
 
 #### Formation Management
+
 - Create educational formations
 - Set formation details (title, description, duration, level)
 - Manage formation availability
 
 #### Service Management
+
 - Create platform services
 - Categorize services
 - Manage service availability

@@ -1,20 +1,20 @@
-'use client';
+'use client'
 
-import React, { useState, useRef, useEffect } from 'react';
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
-import { 
-  HomeIcon, 
-  UsersIcon, 
-  CalendarIcon, 
-  AcademicCapIcon, 
+import React, { useState, useRef, useEffect } from 'react'
+import Link from 'next/link'
+import { usePathname, useRouter } from 'next/navigation'
+import { useAuth } from '@/contexts/AuthContext'
+import {
+  HomeIcon,
+  UsersIcon,
+  CalendarIcon,
+  AcademicCapIcon,
   CogIcon,
   ChartBarIcon,
   ArrowRightOnRectangleIcon,
   UserIcon,
-  ChevronDownIcon
-} from '@heroicons/react/24/outline';
+  ChevronDownIcon,
+} from '@heroicons/react/24/outline'
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
@@ -23,38 +23,38 @@ const navigation = [
   { name: 'Formations', href: '/formations', icon: AcademicCapIcon },
   { name: 'Services', href: '/services', icon: CogIcon },
   { name: 'Analytics', href: '/analytics', icon: ChartBarIcon },
-];
+]
 
 export default function Sidebar() {
-  const pathname = usePathname();
-  const router = useRouter();
-  const { user, logout } = useAuth();
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname()
+  const router = useRouter()
+  const { user, logout } = useAuth()
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
 
   // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsDropdownOpen(false);
+        setIsDropdownOpen(false)
       }
     }
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside)
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
 
   const handleEditProfile = () => {
-    setIsDropdownOpen(false);
-    router.push('/profile/edit');
-  };
+    setIsDropdownOpen(false)
+    router.push('/profile/edit')
+  }
 
   const handleLogout = () => {
-    setIsDropdownOpen(false);
-    logout();
-  };
+    setIsDropdownOpen(false)
+    logout()
+  }
 
   return (
     <div className="flex flex-col w-72 bg-neutral-0 border-r border-neutral-200">
@@ -74,7 +74,7 @@ export default function Sidebar() {
       {/* Navigation */}
       <nav className="flex-1 px-4 py-6 space-y-1">
         {navigation.map((item) => {
-          const isActive = pathname === item.href;
+          const isActive = pathname === item.href
           return (
             <Link
               key={item.name}
@@ -85,17 +85,15 @@ export default function Sidebar() {
                   : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900'
               }`}
             >
-              <item.icon 
+              <item.icon
                 className={`w-5 h-5 mr-3 transition-colors ${
                   isActive ? 'text-orange-600' : 'text-neutral-400 group-hover:text-neutral-600'
-                }`} 
+                }`}
               />
               <span className="font-medium">{item.name}</span>
-              {isActive && (
-                <div className="ml-auto w-2 h-2 bg-orange-500 rounded-full"></div>
-              )}
+              {isActive && <div className="ml-auto w-2 h-2 bg-orange-500 rounded-full"></div>}
             </Link>
-          );
+          )
         })}
       </nav>
 
@@ -113,10 +111,16 @@ export default function Sidebar() {
                 </span>
               </div>
               <div className="flex-1 min-w-0 text-left">
-                <p className="text-sm font-medium text-neutral-900 truncate">{user?.fullName || 'Admin User'}</p>
-                <p className="text-xs text-neutral-500 truncate">{user?.email || 'admin@campus-teranga.com'}</p>
+                <p className="text-sm font-medium text-neutral-900 truncate">
+                  {user?.fullName || 'Admin User'}
+                </p>
+                <p className="text-xs text-neutral-500 truncate">
+                  {user?.email || 'admin@campus-teranga.com'}
+                </p>
               </div>
-              <ChevronDownIcon className={`w-4 h-4 text-neutral-400 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+              <ChevronDownIcon
+                className={`w-4 h-4 text-neutral-400 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`}
+              />
             </div>
           </button>
 
@@ -130,7 +134,7 @@ export default function Sidebar() {
                 <UserIcon className="w-5 h-5 mr-3 text-neutral-400" />
                 <span>Modifier le profil</span>
               </button>
-              
+
               <button
                 onClick={handleLogout}
                 className="flex items-center w-full px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors duration-200"
@@ -143,5 +147,5 @@ export default function Sidebar() {
         </div>
       </div>
     </div>
-  );
+  )
 }

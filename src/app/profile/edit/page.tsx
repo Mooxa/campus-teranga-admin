@@ -1,10 +1,10 @@
-'use client';
+'use client'
 
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useRouter } from 'next/navigation';
-import { authAPI } from '@/lib/api';
-import { 
+import React, { useState, useEffect } from 'react'
+import { useAuth } from '@/contexts/AuthContext'
+import { useRouter } from 'next/navigation'
+import { authAPI } from '@/lib/api'
+import {
   UserIcon,
   EnvelopeIcon,
   PhoneIcon,
@@ -13,14 +13,14 @@ import {
   AcademicCapIcon,
   ArrowLeftIcon,
   CheckIcon,
-  XMarkIcon
-} from '@heroicons/react/24/outline';
+  XMarkIcon,
+} from '@heroicons/react/24/outline'
 
 export default function EditProfilePage() {
-  const { user, isAuthenticated, updateUser } = useAuth();
-  const router = useRouter();
-  const [loading] = useState(false);
-  const [saving, setSaving] = useState(false);
+  const { user, isAuthenticated, updateUser } = useAuth()
+  const router = useRouter()
+  const [loading] = useState(false)
+  const [saving, setSaving] = useState(false)
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -29,15 +29,15 @@ export default function EditProfilePage() {
     address: '',
     fieldOfStudy: '',
     yearOfStudy: '',
-    bio: ''
-  });
+    bio: '',
+  })
 
   // Redirect if not authenticated
   useEffect(() => {
     if (!isAuthenticated) {
-      router.push('/login');
+      router.push('/login')
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, router])
 
   // Load user data
   useEffect(() => {
@@ -46,41 +46,48 @@ export default function EditProfilePage() {
         fullName: user.fullName || '',
         email: user.email || '',
         phone: ('phoneNumber' in user ? user.phoneNumber : '') || '',
-        dateOfBirth: ('dateOfBirth' in user && user.dateOfBirth) ? new Date(user.dateOfBirth as string).toISOString().split('T')[0] : '',
+        dateOfBirth:
+          'dateOfBirth' in user && user.dateOfBirth
+            ? new Date(user.dateOfBirth as string).toISOString().split('T')[0]
+            : '',
         address: ('address' in user ? (user.address as string | undefined) : undefined) || '',
-        fieldOfStudy: ('fieldOfStudy' in user ? (user.fieldOfStudy as string | undefined) : undefined) || '',
-        yearOfStudy: ('yearOfStudy' in user ? (user.yearOfStudy as string | undefined) : undefined) || '',
-        bio: ('bio' in user ? (user.bio as string | undefined) : undefined) || ''
-      });
+        fieldOfStudy:
+          ('fieldOfStudy' in user ? (user.fieldOfStudy as string | undefined) : undefined) || '',
+        yearOfStudy:
+          ('yearOfStudy' in user ? (user.yearOfStudy as string | undefined) : undefined) || '',
+        bio: ('bio' in user ? (user.bio as string | undefined) : undefined) || '',
+      })
     }
-  }, [user]);
+  }, [user])
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
-    }));
-  };
+      [name]: value,
+    }))
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSaving(true);
+    e.preventDefault()
+    setSaving(true)
 
     try {
-      const updatedUser = await authAPI.updateProfile(formData);
-      updateUser(updatedUser);
-      router.push('/dashboard');
+      const updatedUser = await authAPI.updateProfile(formData)
+      updateUser(updatedUser)
+      router.push('/dashboard')
     } catch {
       // Error handled silently - consider showing toast notification to user
     } finally {
-      setSaving(false);
+      setSaving(false)
     }
-  };
+  }
 
   const handleCancel = () => {
-    router.back();
-  };
+    router.back()
+  }
 
   if (!isAuthenticated || loading) {
     return (
@@ -94,7 +101,7 @@ export default function EditProfilePage() {
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -109,7 +116,7 @@ export default function EditProfilePage() {
             <ArrowLeftIcon className="h-5 w-5" />
             <span>Retour</span>
           </button>
-          
+
           <div className="flex items-center space-x-4">
             <div className="w-16 h-16 bg-gradient-to-br from-accent-blue to-accent-purple rounded-2xl flex items-center justify-center">
               <span className="text-white font-bold text-xl">
@@ -132,7 +139,7 @@ export default function EditProfilePage() {
                 <UserIcon className="h-6 w-6 mr-3 text-orange-500" />
                 Informations personnelles
               </h2>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-neutral-700 mb-2">
@@ -150,9 +157,7 @@ export default function EditProfilePage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">
-                    Email *
-                  </label>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">Email *</label>
                   <div className="relative">
                     <EnvelopeIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-neutral-400" />
                     <input
@@ -202,9 +207,7 @@ export default function EditProfilePage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-2">
-                  Adresse
-                </label>
+                <label className="block text-sm font-medium text-neutral-700 mb-2">Adresse</label>
                 <div className="relative">
                   <MapPinIcon className="absolute left-3 top-3 h-5 w-5 text-neutral-400" />
                   <input
@@ -225,7 +228,7 @@ export default function EditProfilePage() {
                 <AcademicCapIcon className="h-6 w-6 mr-3 text-orange-500" />
                 Informations académiques
               </h2>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-neutral-700 mb-2">
@@ -267,10 +270,8 @@ export default function EditProfilePage() {
 
             {/* Bio */}
             <div className="space-y-6 pt-6 border-t border-neutral-200">
-              <h2 className="text-xl font-semibold text-neutral-900">
-                À propos de moi
-              </h2>
-              
+              <h2 className="text-xl font-semibold text-neutral-900">À propos de moi</h2>
+
               <div>
                 <label className="block text-sm font-medium text-neutral-700 mb-2">
                   Biographie
@@ -296,7 +297,7 @@ export default function EditProfilePage() {
                 <XMarkIcon className="h-5 w-5" />
                 <span>Annuler</span>
               </button>
-              
+
               <button
                 type="submit"
                 disabled={saving}
@@ -319,5 +320,5 @@ export default function EditProfilePage() {
         </div>
       </div>
     </div>
-  );
+  )
 }
