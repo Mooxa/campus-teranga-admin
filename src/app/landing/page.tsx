@@ -140,7 +140,7 @@ export default function LandingPage() {
     {
       icon: UsersIcon,
       title: 'Communauté',
-      description: 'Rejoignez une communauté dynamique d&apos;étudiants et de professionnels.',
+      description: 'Rejoignez une communauté dynamique d\'étudiants et de professionnels.',
       color: 'text-purple-500',
       bgColor: 'bg-gradient-to-br from-purple-50 to-purple-100',
       iconBg: 'bg-gradient-to-br from-purple-500 to-purple-600',
@@ -183,14 +183,14 @@ export default function LandingPage() {
     {
       name: 'Aminata Diop',
       role: 'Étudiante en Informatique',
-      content: 'Campus Téranga m&apos;a aidée à trouver ma formation idéale et à m&apos;intégrer parfaitement au Sénégal.',
+      content: 'Campus Téranga m\'a aidée à trouver ma formation idéale et à m\'intégrer parfaitement au Sénégal.',
       avatar: 'AD',
       rating: 5
     },
     {
       name: 'Moussa Fall',
       role: 'Étudiant en Économie',
-      content: 'La communauté est incroyable ! J&apos;ai rencontré des personnes formidables et développé mon réseau.',
+      content: 'La communauté est incroyable ! J\'ai rencontré des personnes formidables et développé mon réseau.',
       avatar: 'MF',
       rating: 5
     },
@@ -209,7 +209,7 @@ export default function LandingPage() {
     'Formations certifiantes reconnues',
     'Événements culturels et professionnels',
     'Support administratif complet',
-    'Communauté d&apos;entraide étudiante'
+    'Communauté d\'entraide étudiante'
   ];
 
   return (
@@ -486,7 +486,7 @@ export default function LandingPage() {
               </span>
             </h2>
             <p className="text-xl text-gray-800 max-w-3xl mx-auto">
-              Découvrez l&apos;impact de Campus Téranga sur la communauté étudiante sénégalaise
+              Découvrez l'impact de Campus Téranga sur la communauté étudiante sénégalaise
             </p>
           </div>
 
@@ -621,7 +621,7 @@ export default function LandingPage() {
             </h2>
             
             <p className="text-xl md:text-2xl text-white mb-12 max-w-3xl mx-auto leading-relaxed">
-              Nous croyons en la puissance de l&apos;éducation et de la communauté pour transformer des vies et construire un avenir meilleur pour le Sénégal.
+              Nous croyons en la puissance de l'éducation et de la communauté pour transformer des vies et construire un avenir meilleur pour le Sénégal.
             </p>
           </div>
 
@@ -633,7 +633,7 @@ export default function LandingPage() {
               </div>
               <h3 className="text-2xl font-bold text-white mb-4">Accompagnement Personnalisé</h3>
               <p className="text-white/90 leading-relaxed">
-                Accompagnement personnalisé pour votre intégration dans l&apos;écosystème éducatif sénégalais avec un suivi individuel.
+                Accompagnement personnalisé pour votre intégration dans l'écosystème éducatif sénégalais avec un suivi individuel.
               </p>
             </div>
 
@@ -655,7 +655,7 @@ export default function LandingPage() {
               </div>
               <h3 className="text-2xl font-bold text-white mb-4">Formations Certifiantes</h3>
               <p className="text-white/90 leading-relaxed">
-                Formations certifiantes reconnues par l&apos;industrie pour développer vos compétences professionnelles.
+                Formations certifiantes reconnues par l'industrie pour développer vos compétences professionnelles.
               </p>
             </div>
 
@@ -686,9 +686,9 @@ export default function LandingPage() {
               <div className="w-16 h-16 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-lg">
                 <HeartIcon className="h-8 w-8 text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-white mb-4">Communauté d&apos;Entraide</h3>
+              <h3 className="text-2xl font-bold text-white mb-4">Communauté d'Entraide</h3>
               <p className="text-white/90 leading-relaxed">
-                Communauté d&apos;entraide étudiante pour partager expériences, conseils et créer des liens durables.
+                Communauté d'entraide étudiante pour partager expériences, conseils et créer des liens durables.
               </p>
             </div>
           </div>
@@ -800,12 +800,12 @@ export default function LandingPage() {
               
               <div className="space-y-6 text-lg text-gray-700 leading-relaxed">
                 <p>
-                  Campus Téranga est né de la volonté de faciliter l&apos;intégration et la réussite 
+                  Campus Téranga est né de la volonté de faciliter l'intégration et la réussite 
                 des étudiants au Sénégal. Notre mission est de créer un écosystème éducatif 
                 dynamique qui accompagne chaque étudiant dans son parcours.
               </p>
                 <p>
-                  Nous croyons en la puissance de l&apos;éducation et de la communauté pour 
+                  Nous croyons en la puissance de l'éducation et de la communauté pour 
                 transformer des vies et construire un avenir meilleur pour le Sénégal.
               </p>
               </div>
@@ -1042,7 +1042,7 @@ export default function LandingPage() {
               </p>
               <div className="flex space-x-6 mt-4 md:mt-0">
                 <a href="#" className="text-gray-400 hover:text-orange-400 transition-colors duration-200">Politique de confidentialité</a>
-                <a href="#" className="text-gray-400 hover:text-orange-400 transition-colors duration-200">Conditions d&apos;utilisation</a>
+                <a href="#" className="text-gray-400 hover:text-orange-400 transition-colors duration-200">Conditions d'utilisation</a>
                 <a href="#" className="text-gray-400 hover:text-orange-400 transition-colors duration-200">Mentions légales</a>
               </div>
             </div>
