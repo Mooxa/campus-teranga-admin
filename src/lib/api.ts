@@ -1,7 +1,8 @@
 import axios from 'axios'
 
+// NOTE: NEXT_PUBLIC_API_URL should already include /api, so we don't add it again
 const API_BASE_URL =
-  (process.env.NEXT_PUBLIC_API_URL || 'https://campus-teranga-backend.onrender.com') + '/api'
+  process.env.NEXT_PUBLIC_API_URL || 'https://campus-teranga-backend.onrender.com/api'
 
 // Create axios instance
 const api = axios.create({
