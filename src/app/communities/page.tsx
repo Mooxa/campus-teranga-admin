@@ -183,7 +183,7 @@ export default function CommunitiesPage() {
               Aucune communauté trouvée
             </h3>
             <p className="text-neutral-600">
-              {searchQuery ? "Essayez avec d'autres mots-clés" : 'Créez votre première communauté'}
+              {searchQuery ? "Essayez avec d&apos;autres mots-clés" : 'Créez votre première communauté'}
             </p>
           </div>
         )}
