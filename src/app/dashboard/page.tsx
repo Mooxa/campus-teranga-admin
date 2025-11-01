@@ -19,6 +19,7 @@ import {
   GlobeAltIcon,
   DevicePhoneMobileIcon,
   ComputerDesktopIcon,
+  BuildingOfficeIcon,
 } from '@heroicons/react/24/outline'
 
 export default function DashboardPage() {
@@ -57,6 +58,7 @@ export default function DashboardPage() {
         totalEvents: 0,
         totalFormations: 0,
         totalServices: 0,
+        totalCommunities: 0,
         activeUsers: 0,
         recentUsers: [],
       })
@@ -173,6 +175,17 @@ export default function DashboardPage() {
       changeType: 'positive',
       trend: [5, 6, 7, 8, 9, 10, 11],
     },
+    {
+      name: 'Communities',
+      value: stats?.totalCommunities || 0,
+      icon: BuildingOfficeIcon,
+      color: 'accent-indigo',
+      bgColor: 'bg-gradient-to-br from-indigo-50 to-blue-50',
+      textColor: 'text-indigo-600',
+      change: '+9.8%',
+      changeType: 'positive',
+      trend: [15, 18, 20, 22, 24, 26, 28],
+    },
   ]
 
   const quickStats = [
@@ -235,7 +248,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Enhanced Stats Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 md:gap-6">
               {statCards.map((stat, index) => (
                 <div
                   key={stat.name}
@@ -428,7 +441,7 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div className="p-6">
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
                   <button className="group relative bg-gradient-to-br from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 p-6 rounded-2xl border border-blue-200/50 hover:border-blue-300 transition-all duration-300 hover:shadow-lg hover:shadow-blue-200/50 hover:-translate-y-1">
                     <div className="flex flex-col items-center text-center space-y-4">
                       <div className="p-4 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl group-hover:scale-110 transition-transform duration-300">
@@ -486,6 +499,23 @@ export default function DashboardPage() {
                       </div>
                     </div>
                   </button>
+
+                  <a
+                    href="/communities"
+                    className="group relative bg-gradient-to-br from-indigo-50 to-blue-50 hover:from-indigo-100 hover:to-blue-100 p-6 rounded-2xl border border-indigo-200/50 hover:border-indigo-300 transition-all duration-300 hover:shadow-lg hover:shadow-indigo-200/50 hover:-translate-y-1"
+                  >
+                    <div className="flex flex-col items-center text-center space-y-4">
+                      <div className="p-4 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-2xl group-hover:scale-110 transition-transform duration-300">
+                        <BuildingOfficeIcon className="h-8 w-8 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-bold text-neutral-900 group-hover:text-indigo-700 transition-colors">
+                          Manage Communities
+                        </h3>
+                        <p className="text-xs text-neutral-500 mt-1">Create and manage communities</p>
+                      </div>
+                    </div>
+                  </a>
                 </div>
               </div>
             </div>

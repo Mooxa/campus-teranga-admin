@@ -124,6 +124,7 @@ export interface DashboardStats {
   totalEvents: number
   totalFormations: number
   totalServices: number
+  totalCommunities: number
   activeUsers: number
   recentUsers: User[]
 }
@@ -272,6 +273,26 @@ export const adminAPI = {
 
   deleteService: async (id: string): Promise<void> => {
     await api.delete(`/admin/services/${id}`)
+  },
+
+  // Communities
+  getCommunities: async (): Promise<Community[]> => {
+    const response = await api.get('/admin/communities')
+    return response.data.data?.communities || response.data.data || response.data
+  },
+
+  getCommunity: async (id: string): Promise<Community> => {
+    const response = await api.get(`/admin/communities/${id}`)
+    return response.data.data || response.data
+  },
+
+  updateCommunity: async (id: string, communityData: Partial<Community>): Promise<Community> => {
+    const response = await api.put(`/admin/communities/${id}`, communityData)
+    return response.data.data || response.data
+  },
+
+  deleteCommunity: async (id: string): Promise<void> => {
+    await api.delete(`/admin/communities/${id}`)
   },
 }
 
