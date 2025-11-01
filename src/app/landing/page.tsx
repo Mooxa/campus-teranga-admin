@@ -4,6 +4,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
+import { publicAPI, communityAPI } from '@/lib/api'
 import {
   AcademicCapIcon,
   CalendarIcon,
@@ -16,7 +17,6 @@ import {
   CheckCircleIcon,
   ArrowRightIcon,
   PlayIcon,
-  StarIcon,
   SparklesIcon,
   RocketLaunchIcon,
   HeartIcon,
@@ -29,6 +29,7 @@ import {
   UserIcon,
   ArrowRightOnRectangleIcon,
   ChevronDownIcon,
+  BuildingOfficeIcon,
 } from '@heroicons/react/24/outline'
 
 export default function LandingPage() {
@@ -38,15 +39,43 @@ export default function LandingPage() {
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false)
   const profileDropdownRef = useRef<HTMLDivElement>(null)
   const [isVisible, setIsVisible] = useState(false)
-  const [animatedStats, setAnimatedStats] = useState({
-    students: 0,
+  const [realStats, setRealStats] = useState({
     formations: 0,
     events: 0,
     services: 0,
+    communities: 0,
   })
+  const [loadingStats, setLoadingStats] = useState(true)
 
   const heroRef = useRef<HTMLDivElement>(null)
   const statsRef = useRef<HTMLDivElement>(null)
+
+  // Fetch real stats from API
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const [formations, events, services, communities] = await Promise.all([
+          publicAPI.getFormations().catch(() => []),
+          publicAPI.getEvents().catch(() => []),
+          publicAPI.getServices().catch(() => []),
+          communityAPI.getCommunities().catch(() => []),
+        ])
+
+        setRealStats({
+          formations: Array.isArray(formations) ? formations.length : 0,
+          events: Array.isArray(events) ? events.length : 0,
+          services: Array.isArray(services) ? services.length : 0,
+          communities: Array.isArray(communities) ? communities.length : 0,
+        })
+      } catch {
+        // Handle error silently
+      } finally {
+        setLoadingStats(false)
+      }
+    }
+
+    fetchStats()
+  }, [])
 
   // Close profile dropdown when clicking outside
   useEffect(() => {
@@ -88,9 +117,16 @@ export default function LandingPage() {
     return () => observer.disconnect()
   }, [])
 
-  // Animate counters
+  const [animatedStats, setAnimatedStats] = useState({
+    formations: 0,
+    events: 0,
+    services: 0,
+    communities: 0,
+  })
+
+  // Animate counters with real data
   useEffect(() => {
-    if (isVisible) {
+    if (isVisible && !loadingStats) {
       const animateCounter = (
         target: number,
         key: keyof typeof animatedStats,
@@ -109,12 +145,12 @@ export default function LandingPage() {
         }, 16)
       }
 
-      animateCounter(500, 'students')
-      animateCounter(50, 'formations', 1500)
-      animateCounter(100, 'events', 1800)
-      animateCounter(15, 'services', 1200)
+      animateCounter(realStats.formations, 'formations', 1500)
+      animateCounter(realStats.events, 'events', 1800)
+      animateCounter(realStats.services, 'services', 1200)
+      animateCounter(realStats.communities, 'communities', 1600)
     }
-  }, [isVisible])
+  }, [isVisible, loadingStats, realStats])
 
   const features = [
     {
@@ -159,61 +195,35 @@ export default function LandingPage() {
 
   const stats = [
     {
-      number: animatedStats.students,
-      label: 'Étudiants Actifs',
-      icon: UsersIcon,
-      color: 'text-orange-500',
-      bgColor: 'bg-gradient-to-br from-orange-500 to-orange-600',
-    },
-    {
       number: animatedStats.formations,
       label: 'Formations Disponibles',
       icon: AcademicCapIcon,
-      color: 'text-blue-500',
-      bgColor: 'bg-gradient-to-br from-blue-500 to-blue-600',
+      color: 'text-orange-500',
+      bgColor: 'bg-gradient-to-br from-orange-500 to-orange-600',
     },
     {
       number: animatedStats.events,
       label: 'Événements Organisés',
       icon: CalendarIcon,
-      color: 'text-green-500',
-      bgColor: 'bg-gradient-to-br from-green-500 to-green-600',
+      color: 'text-blue-500',
+      bgColor: 'bg-gradient-to-br from-blue-500 to-blue-600',
     },
     {
       number: animatedStats.services,
       label: 'Services Étudiants',
       icon: CogIcon,
+      color: 'text-green-500',
+      bgColor: 'bg-gradient-to-br from-green-500 to-green-600',
+    },
+    {
+      number: animatedStats.communities,
+      label: 'Communautés Actives',
+      icon: BuildingOfficeIcon,
       color: 'text-purple-500',
       bgColor: 'bg-gradient-to-br from-purple-500 to-purple-600',
     },
   ]
 
-  const testimonials = [
-    {
-      name: 'Aminata Diop',
-      role: 'Étudiante en Informatique',
-      content:
-        "Campus Téranga m'a aidée à trouver ma formation idéale et à m'intégrer parfaitement au Sénégal.",
-      avatar: 'AD',
-      rating: 5,
-    },
-    {
-      name: 'Moussa Fall',
-      role: 'Étudiant en Économie',
-      content:
-        "La communauté est incroyable ! J'ai rencontré des personnes formidables et développé mon réseau.",
-      avatar: 'MF',
-      rating: 5,
-    },
-    {
-      name: 'Fatou Sarr',
-      role: 'Étudiante en Médecine',
-      content:
-        "Les services proposés sont exceptionnels. L'accompagnement est personnalisé et très professionnel.",
-      avatar: 'FS',
-      rating: 5,
-    },
-  ]
 
   const benefits = [
     'Accompagnement personnalisé pour votre intégration',
@@ -252,12 +262,6 @@ export default function LandingPage() {
                 className="text-gray-600 hover:text-orange-600 transition-colors font-medium"
               >
                 À Propos
-              </a>
-              <a
-                href="#testimonials"
-                className="text-gray-600 hover:text-orange-600 transition-colors font-medium"
-              >
-                Témoignages
               </a>
               <a
                 href="#contact"
@@ -396,12 +400,6 @@ export default function LandingPage() {
                 className="block text-gray-600 hover:text-orange-600 transition-colors font-medium"
               >
                 À Propos
-              </a>
-              <a
-                href="#testimonials"
-                className="block text-gray-600 hover:text-orange-600 transition-colors font-medium"
-              >
-                Témoignages
               </a>
               <a
                 href="#contact"
@@ -568,7 +566,21 @@ export default function LandingPage() {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
+            {loadingStats ? (
+              <>
+                {[1, 2, 3, 4].map((i) => (
+                  <div
+                    key={i}
+                    className="text-center p-8 rounded-3xl bg-white/80 backdrop-blur-sm border border-gray-200/50"
+                  >
+                    <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gray-200 animate-pulse"></div>
+                    <div className="h-12 w-20 mx-auto mb-3 bg-gray-200 rounded animate-pulse"></div>
+                    <div className="h-6 w-32 mx-auto bg-gray-200 rounded animate-pulse"></div>
+                  </div>
+                ))}
+              </>
+            ) : (
+              stats.map((stat, index) => (
               <div
                 key={index}
                 className="group text-center p-8 rounded-3xl bg-white/80 backdrop-blur-sm border border-gray-200/50 hover:shadow-2xl hover:shadow-orange-200/50 transition-all duration-500 transform hover:-translate-y-2"
@@ -586,7 +598,8 @@ export default function LandingPage() {
                 </div>
                 <div className="text-gray-800 font-semibold text-lg">{stat.label}</div>
               </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       </section>
@@ -810,68 +823,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Testimonials Section */}
-      <section
-        id="testimonials"
-        className="py-24 bg-gradient-to-br from-blue-50 via-white to-orange-50 relative overflow-hidden"
-      >
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-10 right-10 w-32 h-32 bg-blue-200/20 rounded-full blur-xl"></div>
-          <div className="absolute bottom-10 left-10 w-40 h-40 bg-orange-200/20 rounded-full blur-xl"></div>
-        </div>
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-20">
-            <div className="inline-flex items-center px-4 py-2 rounded-full bg-blue-100 text-blue-600 text-sm font-semibold mb-6">
-              <StarIcon className="w-4 h-4 mr-2" />
-              Témoignages
-            </div>
-            <h2 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-              Ce que disent nos{' '}
-              <span className="bg-gradient-to-r from-blue-500 to-orange-500 bg-clip-text text-transparent">
-                étudiants
-              </span>
-            </h2>
-            <p className="text-xl text-gray-800 max-w-3xl mx-auto">
-              Découvrez les expériences de nos étudiants qui ont transformé leur parcours avec
-              Campus Téranga
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <div
-                key={index}
-                className="group p-8 rounded-3xl bg-white/80 backdrop-blur-sm border border-gray-200/50 hover:shadow-2xl hover:shadow-blue-200/50 transition-all duration-500 transform hover:-translate-y-2"
-                style={{ animationDelay: `${index * 200}ms` }}
-              >
-                {/* Stars */}
-                <div className="flex mb-6">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <StarIcon key={i} className="w-5 h-5 text-yellow-400 fill-current" />
-                  ))}
-                </div>
-
-                {/* Content */}
-                <p className="text-gray-700 mb-6 leading-relaxed italic">
-                  &quot;{testimonial.content}&quot;
-                </p>
-
-                {/* Author */}
-                <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-orange-500 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
-                    {testimonial.avatar}
-                  </div>
-                  <div>
-                    <div className="font-semibold text-gray-900">{testimonial.name}</div>
-                    <div className="text-sm text-gray-600">{testimonial.role}</div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* Modern About Section */}
       <section
