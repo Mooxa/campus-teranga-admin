@@ -1,12 +1,8 @@
 import type { NextConfig } from 'next'
-import path from 'path'
 
 const nextConfig: NextConfig = {
-  // Optimize for Vercel deployment
-  output: 'standalone',
-
-  // Set output file tracing root to silence workspace warning
-  outputFileTracingRoot: path.join(__dirname, '../../'),
+  // Note: output: 'standalone' removed - Vercel handles this automatically
+  // Setting it manually can cause routes-manifest.json errors on Vercel
 
   // Environment variables
   env: {
