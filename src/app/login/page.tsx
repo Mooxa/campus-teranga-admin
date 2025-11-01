@@ -154,7 +154,7 @@ export default function LoginPage() {
             <p className="text-xs text-neutral-600 text-center">
               <span className="font-medium">Test credentials:</span>
               <br />
-              +221771234568 / admin123
+              +221771234568 / Admin123
             </p>
           </div>
         </div>

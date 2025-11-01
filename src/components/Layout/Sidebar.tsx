@@ -14,6 +14,7 @@ import {
   ArrowRightOnRectangleIcon,
   UserIcon,
   ChevronDownIcon,
+  BuildingOfficeIcon,
 } from '@heroicons/react/24/outline'
 
 const navigation = [
@@ -22,6 +23,7 @@ const navigation = [
   { name: 'Events', href: '/events', icon: CalendarIcon },
   { name: 'Formations', href: '/formations', icon: AcademicCapIcon },
   { name: 'Services', href: '/services', icon: CogIcon },
+  { name: 'Communities', href: '/communities', icon: BuildingOfficeIcon },
   { name: 'Analytics', href: '/analytics', icon: ChartBarIcon },
 ]
 
