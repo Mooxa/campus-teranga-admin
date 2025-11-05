@@ -380,8 +380,23 @@ export interface Community {
 export const communityAPI = {
   // Get all communities
   getCommunities: async (): Promise<Community[]> => {
-    const response = await api.get('/communities')
-    return response.data.data || response.data
+    try {
+      const response = await api.get('/communities')
+      // Handle different response formats
+      if (response.data.success && Array.isArray(response.data.data)) {
+        return response.data.data
+      }
+      if (Array.isArray(response.data.data)) {
+        return response.data.data
+      }
+      if (Array.isArray(response.data)) {
+        return response.data
+      }
+      return []
+    } catch (error) {
+      console.error('Error fetching communities:', error)
+      return []
+    }
   },
 
   // Get community by ID

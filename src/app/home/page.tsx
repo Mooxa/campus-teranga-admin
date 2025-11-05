@@ -130,10 +130,22 @@ export default function HomePage() {
   const fetchContent = async () => {
     try {
       const [formations, events, services, communities] = await Promise.all([
-        publicAPI.getFormations(),
-        publicAPI.getEvents(),
-        publicAPI.getServices(),
-        communityAPI.getCommunities(),
+        publicAPI.getFormations().catch((err) => {
+          console.error('Error fetching formations:', err)
+          return []
+        }),
+        publicAPI.getEvents().catch((err) => {
+          console.error('Error fetching events:', err)
+          return []
+        }),
+        publicAPI.getServices().catch((err) => {
+          console.error('Error fetching services:', err)
+          return []
+        }),
+        communityAPI.getCommunities().catch((err) => {
+          console.error('Error fetching communities:', err)
+          return []
+        }),
       ])
 
       setContent({
@@ -142,8 +154,8 @@ export default function HomePage() {
         services: Array.isArray(services) ? services : [],
         communities: Array.isArray(communities) ? communities : [],
       })
-    } catch {
-      // Error handled silently
+    } catch (error) {
+      console.error('Error fetching content:', error)
     } finally {
       setLoading(false)
     }
