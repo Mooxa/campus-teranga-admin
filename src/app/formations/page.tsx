@@ -24,8 +24,8 @@ export default function FormationsPage() {
   const [formations, setFormations] = useState<Formation[]>([])
   const [filteredFormations, setFilteredFormations] = useState<Formation[]>([])
   const [loading, setLoading] = useState(true)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_editingFormation, setEditingFormation] = useState<Formation | null>(null)
+  const [editingFormation, setEditingFormation] = useState<Formation | null>(null)
+  const [showFormationModal, setShowFormationModal] = useState(false)
   const [selectedFormation, setSelectedFormation] = useState<Formation | null>(null)
   const [showProgramsModal, setShowProgramsModal] = useState(false)
   const [editingProgram, setEditingProgram] = useState<{ program: Program; index: number } | null>(
@@ -152,6 +152,46 @@ export default function FormationsPage() {
     }
   }
 
+  const handleSaveFormation = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+
+    const formData = new FormData(e.currentTarget)
+    const formationData: Partial<Formation> = {
+      name: formData.get('name') as string,
+      shortName: formData.get('shortName') as string,
+      type: formData.get('type') as 'public' | 'private',
+      description: formData.get('description') as string,
+      location: {
+        city: formData.get('city') as string,
+        district: formData.get('district') as string,
+        address: formData.get('address') as string,
+      },
+      website: formData.get('website') as string || '',
+      phone: formData.get('phone') as string || '',
+      email: formData.get('email') as string || '',
+      image: formData.get('image') as string || '',
+      isActive: formData.get('isActive') === 'true',
+    }
+
+    try {
+      if (editingFormation?._id) {
+        await adminAPI.updateFormation(editingFormation._id, formationData)
+      } else {
+        await adminAPI.createFormation(formationData)
+      }
+      await fetchFormations()
+      setShowFormationModal(false)
+      setEditingFormation(null)
+    } catch {
+      // Error handled silently
+    }
+  }
+
+  const handleCancelFormation = () => {
+    setShowFormationModal(false)
+    setEditingFormation(null)
+  }
+
   if (isLoading || loading) {
     return (
       <ProtectedRoute>
@@ -197,7 +237,10 @@ export default function FormationsPage() {
                   </div>
                 </div>
                 <button
-                  onClick={() => setEditingFormation({} as Formation)}
+                  onClick={() => {
+                    setEditingFormation({} as Formation)
+                    setShowFormationModal(true)
+                  }}
                   className="mt-4 sm:mt-0 inline-flex items-center px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
                 >
                   <PlusIcon className="h-5 w-5 mr-2" />
@@ -394,7 +437,10 @@ export default function FormationsPage() {
                           )}
                         </button>
                         <button
-                          onClick={() => setEditingFormation(formation)}
+                          onClick={() => {
+                            setEditingFormation(formation)
+                            setShowFormationModal(true)
+                          }}
                           className="p-2 text-neutral-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-all"
                           title="Edit"
                         >
@@ -576,6 +622,237 @@ export default function FormationsPage() {
                     </div>
                   )}
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* Formation Add/Edit Modal */}
+          {showFormationModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+              <div className="bg-white rounded-2xl shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+                <div className="sticky top-0 bg-white border-b border-neutral-200 px-6 py-4 flex items-center justify-between">
+                  <div>
+                    <h2 className="text-xl font-semibold text-neutral-900">
+                      {editingFormation?._id ? 'Edit Formation' : 'Add New Formation'}
+                    </h2>
+                    <p className="text-sm text-neutral-500">
+                      {editingFormation?._id
+                        ? 'Update formation information'
+                        : 'Create a new educational institution'}
+                    </p>
+                  </div>
+                  <button
+                    onClick={handleCancelFormation}
+                    className="p-2 text-neutral-400 hover:text-neutral-600 rounded-lg hover:bg-neutral-100 transition-all"
+                  >
+                    <XMarkIcon className="h-6 w-6" />
+                  </button>
+                </div>
+
+                <form onSubmit={handleSaveFormation} className="p-6 space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Name */}
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-700 mb-2">
+                        Name <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="name"
+                        defaultValue={editingFormation?.name || ''}
+                        required
+                        className="w-full px-4 py-2 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        placeholder="e.g., Université Cheikh Anta Diop"
+                      />
+                    </div>
+
+                    {/* Short Name */}
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-700 mb-2">
+                        Short Name <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="shortName"
+                        defaultValue={editingFormation?.shortName || ''}
+                        required
+                        className="w-full px-4 py-2 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        placeholder="e.g., UCAD"
+                      />
+                    </div>
+
+                    {/* Type */}
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-700 mb-2">
+                        Type <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        name="type"
+                        defaultValue={editingFormation?.type || 'public'}
+                        required
+                        className="w-full px-4 py-2 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      >
+                        <option value="public">Public</option>
+                        <option value="private">Private</option>
+                      </select>
+                    </div>
+
+                    {/* Active Status */}
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-700 mb-2">
+                        Status <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        name="isActive"
+                        defaultValue={
+                          editingFormation?.isActive !== undefined
+                            ? editingFormation.isActive.toString()
+                            : 'true'
+                        }
+                        required
+                        className="w-full px-4 py-2 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      >
+                        <option value="true">Active</option>
+                        <option value="false">Inactive</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Description */}
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                      Description <span className="text-red-500">*</span>
+                    </label>
+                    <textarea
+                      name="description"
+                      defaultValue={editingFormation?.description || ''}
+                      required
+                      rows={4}
+                      className="w-full px-4 py-2 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      placeholder="Enter a detailed description of the formation..."
+                    />
+                  </div>
+
+                  {/* Location */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-neutral-900">Location</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-700 mb-2">
+                          City <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          name="city"
+                          defaultValue={editingFormation?.location?.city || ''}
+                          required
+                          className="w-full px-4 py-2 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                          placeholder="e.g., Dakar"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-700 mb-2">
+                          District <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          name="district"
+                          defaultValue={editingFormation?.location?.district || ''}
+                          required
+                          className="w-full px-4 py-2 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                          placeholder="e.g., Plateau"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-700 mb-2">
+                          Address <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          name="address"
+                          defaultValue={editingFormation?.location?.address || ''}
+                          required
+                          className="w-full px-4 py-2 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                          placeholder="Full address"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Contact Information */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-neutral-900">Contact Information</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-700 mb-2">
+                          Phone
+                        </label>
+                        <input
+                          type="tel"
+                          name="phone"
+                          defaultValue={editingFormation?.phone || ''}
+                          className="w-full px-4 py-2 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                          placeholder="+221 XX XXX XX XX"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-700 mb-2">
+                          Email
+                        </label>
+                        <input
+                          type="email"
+                          name="email"
+                          defaultValue={editingFormation?.email || ''}
+                          className="w-full px-4 py-2 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                          placeholder="contact@example.com"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-700 mb-2">
+                          Website
+                        </label>
+                        <input
+                          type="url"
+                          name="website"
+                          defaultValue={editingFormation?.website || ''}
+                          className="w-full px-4 py-2 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                          placeholder="https://example.com"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Image URL */}
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                      Image URL
+                    </label>
+                    <input
+                      type="url"
+                      name="image"
+                      defaultValue={editingFormation?.image || ''}
+                      className="w-full px-4 py-2 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      placeholder="https://example.com/image.jpg"
+                    />
+                  </div>
+
+                  {/* Form Actions */}
+                  <div className="flex space-x-3 pt-4 border-t border-neutral-200">
+                    <button
+                      type="submit"
+                      className="flex-1 px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold rounded-xl hover:from-orange-600 hover:to-orange-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                    >
+                      {editingFormation?._id ? 'Update Formation' : 'Create Formation'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleCancelFormation}
+                      className="flex-1 px-6 py-3 bg-neutral-200 text-neutral-700 font-semibold rounded-xl hover:bg-neutral-300 transition-all duration-200"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
           )}
