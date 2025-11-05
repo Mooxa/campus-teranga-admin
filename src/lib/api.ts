@@ -287,7 +287,8 @@ export const adminAPI = {
   },
 
   createCommunity: async (communityData: Partial<Community>): Promise<Community> => {
-    const response = await api.post('/admin/communities', communityData)
+    // Use the regular /communities endpoint since admin routes don't have POST
+    const response = await api.post('/communities', communityData)
     return response.data.data || response.data
   },
 
