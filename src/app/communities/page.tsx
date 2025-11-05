@@ -28,6 +28,7 @@ export default function CommunitiesPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [categoryFilter, setCategoryFilter] = useState<string>('all')
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all')
+  const [approvalFilter, setApprovalFilter] = useState<'all' | 'approved' | 'pending'>('all')
   const [sortBy, setSortBy] = useState<'name' | 'category' | 'created'>('name')
 
   useEffect(() => {
@@ -50,7 +51,12 @@ export default function CommunitiesPage() {
         (statusFilter === 'active' && community.isActive) ||
         (statusFilter === 'inactive' && !community.isActive)
 
-      return matchesSearch && matchesCategory && matchesStatus
+      const matchesApproval =
+        approvalFilter === 'all' ||
+        (approvalFilter === 'approved' && community.isApproved) ||
+        (approvalFilter === 'pending' && !community.isApproved)
+
+      return matchesSearch && matchesCategory && matchesStatus && matchesApproval
     })
 
     // Sort communities
@@ -68,7 +74,7 @@ export default function CommunitiesPage() {
     })
 
     setFilteredCommunities(filtered)
-  }, [communities, searchQuery, categoryFilter, statusFilter, sortBy])
+  }, [communities, searchQuery, categoryFilter, statusFilter, approvalFilter, sortBy])
 
   const fetchCommunities = async () => {
     try {
@@ -158,6 +164,26 @@ export default function CommunitiesPage() {
     setEditingCommunity(null)
   }
 
+  const handleApproveCommunity = async (communityId: string) => {
+    try {
+      await adminAPI.approveCommunity(communityId)
+      await fetchCommunities()
+    } catch {
+      // Error handled silently
+    }
+  }
+
+  const handleRejectCommunity = async (communityId: string) => {
+    if (confirm('Are you sure you want to reject this community?')) {
+      try {
+        await adminAPI.rejectCommunity(communityId)
+        await fetchCommunities()
+      } catch {
+        // Error handled silently
+      }
+    }
+  }
+
   if (isLoading || loading) {
     return (
       <ProtectedRoute>
@@ -217,7 +243,7 @@ export default function CommunitiesPage() {
           {/* Filters Section */}
           <div className="bg-white border-b border-neutral-200">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                 {/* Search */}
                 <div className="relative">
                   <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-neutral-400" />
@@ -256,6 +282,17 @@ export default function CommunitiesPage() {
                   <option value="inactive">Inactive</option>
                 </select>
 
+                {/* Approval Filter */}
+                <select
+                  value={approvalFilter}
+                  onChange={(e) => setApprovalFilter(e.target.value as 'all' | 'approved' | 'pending')}
+                  className="px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                >
+                  <option value="all">All Approval</option>
+                  <option value="approved">Approved</option>
+                  <option value="pending">Pending</option>
+                </select>
+
                 {/* Sort */}
                 <select
                   value={sortBy}
@@ -276,16 +313,16 @@ export default function CommunitiesPage() {
               <div className="text-center py-16">
                 <BuildingOfficeIcon className="h-16 w-16 text-neutral-400 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-neutral-900 mb-2">
-                  {searchQuery || categoryFilter !== 'all' || statusFilter !== 'all'
+                  {searchQuery || categoryFilter !== 'all' || statusFilter !== 'all' || approvalFilter !== 'all'
                     ? 'No communities found'
                     : 'No communities yet'}
                 </h3>
                 <p className="text-neutral-600 mb-6">
-                  {searchQuery || categoryFilter !== 'all' || statusFilter !== 'all'
+                  {searchQuery || categoryFilter !== 'all' || statusFilter !== 'all' || approvalFilter !== 'all'
                     ? 'Try adjusting your filters'
                     : 'Get started by creating your first community'}
                 </p>
-                {!searchQuery && categoryFilter === 'all' && statusFilter === 'all' && (
+                {!searchQuery && categoryFilter === 'all' && statusFilter === 'all' && approvalFilter === 'all' && (
                   <button
                     onClick={() => {
                       setEditingCommunity(null)
@@ -324,11 +361,20 @@ export default function CommunitiesPage() {
                           <h3 className="text-xl font-semibold text-neutral-900 mb-2">
                             {community.name}
                           </h3>
-                          <div className="flex items-center gap-2 mb-2">
+                          <div className="flex items-center gap-2 mb-2 flex-wrap">
                             <TagIcon className="h-4 w-4 text-neutral-400" />
                             <span className="inline-block px-2 py-1 bg-indigo-100 text-indigo-600 rounded-full text-xs font-semibold">
                               {getCategoryLabel(community.category)}
                             </span>
+                            {community.isApproved ? (
+                              <span className="inline-block px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">
+                                Approved
+                              </span>
+                            ) : (
+                              <span className="inline-block px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-semibold">
+                                Pending
+                              </span>
+                            )}
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
@@ -356,44 +402,64 @@ export default function CommunitiesPage() {
                       </div>
 
                       {/* Actions */}
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => handleToggleActive(community)}
-                          className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                            community.isActive
-                              ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                              : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
-                          }`}
-                        >
-                          {community.isActive ? 'Active' : 'Inactive'}
-                        </button>
-                        <button
-                          onClick={() => handleTogglePublic(community)}
-                          className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                            community.isPublic
-                              ? 'bg-blue-100 text-blue-700 hover:bg-blue-200'
-                              : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
-                          }`}
-                        >
-                          {community.isPublic ? 'Public' : 'Private'}
-                        </button>
-                        <button
-                          onClick={() => {
-                            setEditingCommunity(community)
-                            setShowCreateModal(true)
-                          }}
-                          className="px-3 py-2 bg-neutral-100 text-neutral-700 hover:bg-neutral-200 rounded-lg transition-colors"
-                          title="Edit"
-                        >
-                          <PencilIcon className="h-4 w-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteCommunity(community._id)}
-                          className="px-3 py-2 bg-red-100 text-red-700 hover:bg-red-200 rounded-lg transition-colors"
-                          title="Delete"
-                        >
-                          <TrashIcon className="h-4 w-4" />
-                        </button>
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handleToggleActive(community)}
+                            className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                              community.isActive
+                                ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                                : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+                            }`}
+                          >
+                            {community.isActive ? 'Active' : 'Inactive'}
+                          </button>
+                          <button
+                            onClick={() => handleTogglePublic(community)}
+                            className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                              community.isPublic
+                                ? 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                                : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'
+                            }`}
+                          >
+                            {community.isPublic ? 'Public' : 'Private'}
+                          </button>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {!community.isApproved && (
+                            <button
+                              onClick={() => handleApproveCommunity(community._id)}
+                              className="flex-1 px-3 py-2 bg-green-500 text-white hover:bg-green-600 rounded-lg text-sm font-medium transition-colors"
+                            >
+                              Approve
+                            </button>
+                          )}
+                          {!community.isApproved && (
+                            <button
+                              onClick={() => handleRejectCommunity(community._id)}
+                              className="flex-1 px-3 py-2 bg-red-500 text-white hover:bg-red-600 rounded-lg text-sm font-medium transition-colors"
+                            >
+                              Reject
+                            </button>
+                          )}
+                          <button
+                            onClick={() => {
+                              setEditingCommunity(community)
+                              setShowCreateModal(true)
+                            }}
+                            className="px-3 py-2 bg-neutral-100 text-neutral-700 hover:bg-neutral-200 rounded-lg transition-colors"
+                            title="Edit"
+                          >
+                            <PencilIcon className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteCommunity(community._id)}
+                            className="px-3 py-2 bg-red-100 text-red-700 hover:bg-red-200 rounded-lg transition-colors"
+                            title="Delete"
+                          >
+                            <TrashIcon className="h-4 w-4" />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>

@@ -299,6 +299,16 @@ export const adminAPI = {
   deleteCommunity: async (id: string): Promise<void> => {
     await api.delete(`/admin/communities/${id}`)
   },
+
+  approveCommunity: async (id: string): Promise<Community> => {
+    const response = await api.post(`/admin/communities/${id}/approve`)
+    return response.data.data || response.data
+  },
+
+  rejectCommunity: async (id: string): Promise<Community> => {
+    const response = await api.post(`/admin/communities/${id}/reject`)
+    return response.data.data || response.data
+  },
 }
 
 // Public API - no authentication required
@@ -372,6 +382,9 @@ export interface Community {
   posts: CommunityPost[]
   isPublic: boolean
   isActive: boolean
+  isApproved: boolean
+  approvedBy?: User
+  approvedAt?: string
   createdAt: string
   updatedAt: string
 }
