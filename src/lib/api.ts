@@ -286,6 +286,11 @@ export const adminAPI = {
     return response.data.data || response.data
   },
 
+  createCommunity: async (communityData: Partial<Community>): Promise<Community> => {
+    const response = await api.post('/admin/communities', communityData)
+    return response.data.data || response.data
+  },
+
   updateCommunity: async (id: string, communityData: Partial<Community>): Promise<Community> => {
     const response = await api.put(`/admin/communities/${id}`, communityData)
     return response.data.data || response.data

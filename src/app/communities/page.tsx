@@ -15,7 +15,7 @@ import {
   UserGroupIcon,
   MagnifyingGlassIcon,
   TagIcon,
-  SparklesIcon,
+  XMarkIcon,
 } from '@heroicons/react/24/outline'
 
 export default function CommunitiesPage() {
@@ -126,6 +126,38 @@ export default function CommunitiesPage() {
     return labels[category] || category
   }
 
+  const handleSaveCommunity = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+
+    const formData = new FormData(e.currentTarget)
+    const communityData: Partial<Community> = {
+      name: formData.get('name') as string,
+      description: formData.get('description') as string,
+      category: formData.get('category') as Community['category'],
+      image: formData.get('image') as string || '',
+      isPublic: formData.get('isPublic') === 'true',
+      isActive: formData.get('isActive') === 'true',
+    }
+
+    try {
+      if (editingCommunity?._id) {
+        await adminAPI.updateCommunity(editingCommunity._id, communityData)
+      } else {
+        await adminAPI.createCommunity(communityData)
+      }
+      await fetchCommunities()
+      setShowCreateModal(false)
+      setEditingCommunity(null)
+    } catch {
+      // Error handled silently
+    }
+  }
+
+  const handleCancelCommunity = () => {
+    setShowCreateModal(false)
+    setEditingCommunity(null)
+  }
+
   if (isLoading || loading) {
     return (
       <ProtectedRoute>
@@ -169,7 +201,10 @@ export default function CommunitiesPage() {
                   </p>
                 </div>
                 <button
-                  onClick={() => setShowCreateModal(true)}
+                  onClick={() => {
+                    setEditingCommunity(null)
+                    setShowCreateModal(true)
+                  }}
                   className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
                 >
                   <PlusIcon className="h-5 w-5" />
@@ -252,7 +287,10 @@ export default function CommunitiesPage() {
                 </p>
                 {!searchQuery && categoryFilter === 'all' && statusFilter === 'all' && (
                   <button
-                    onClick={() => setShowCreateModal(true)}
+                    onClick={() => {
+                      setEditingCommunity(null)
+                      setShowCreateModal(true)
+                    }}
                     className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg"
                   >
                     <PlusIcon className="h-5 w-5" />
@@ -340,7 +378,10 @@ export default function CommunitiesPage() {
                           {community.isPublic ? 'Public' : 'Private'}
                         </button>
                         <button
-                          onClick={() => setEditingCommunity(community)}
+                          onClick={() => {
+                            setEditingCommunity(community)
+                            setShowCreateModal(true)
+                          }}
                           className="px-3 py-2 bg-neutral-100 text-neutral-700 hover:bg-neutral-200 rounded-lg transition-colors"
                           title="Edit"
                         >
@@ -367,6 +408,157 @@ export default function CommunitiesPage() {
               </div>
             )}
           </div>
+
+          {/* Community Add/Edit Modal */}
+          {showCreateModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+              <div className="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                <div className="sticky top-0 bg-white border-b border-neutral-200 px-6 py-4 flex items-center justify-between">
+                  <div>
+                    <h2 className="text-xl font-semibold text-neutral-900">
+                      {editingCommunity?._id ? 'Edit Community' : 'Create New Community'}
+                    </h2>
+                    <p className="text-sm text-neutral-500">
+                      {editingCommunity?._id
+                        ? 'Update community information'
+                        : 'Create a new community for students to join'}
+                    </p>
+                  </div>
+                  <button
+                    onClick={handleCancelCommunity}
+                    className="p-2 text-neutral-400 hover:text-neutral-600 rounded-lg hover:bg-neutral-100 transition-all"
+                  >
+                    <XMarkIcon className="h-6 w-6" />
+                  </button>
+                </div>
+
+                <form onSubmit={handleSaveCommunity} className="p-6 space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Name */}
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-neutral-700 mb-2">
+                        Name <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="name"
+                        defaultValue={editingCommunity?.name || ''}
+                        required
+                        className="w-full px-4 py-2 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        placeholder="e.g., Club Informatique"
+                      />
+                    </div>
+
+                    {/* Category */}
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-700 mb-2">
+                        Category <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        name="category"
+                        defaultValue={editingCommunity?.category || 'academic'}
+                        required
+                        className="w-full px-4 py-2 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      >
+                        <option value="academic">Academic</option>
+                        <option value="social">Social</option>
+                        <option value="professional">Professional</option>
+                        <option value="cultural">Cultural</option>
+                        <option value="sports">Sports</option>
+                        <option value="other">Other</option>
+                      </select>
+                    </div>
+
+                    {/* Public Status */}
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-700 mb-2">
+                        Visibility <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        name="isPublic"
+                        defaultValue={
+                          editingCommunity?.isPublic !== undefined
+                            ? editingCommunity.isPublic.toString()
+                            : 'true'
+                        }
+                        required
+                        className="w-full px-4 py-2 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      >
+                        <option value="true">Public</option>
+                        <option value="false">Private</option>
+                      </select>
+                    </div>
+
+                    {/* Active Status */}
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-700 mb-2">
+                        Status <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        name="isActive"
+                        defaultValue={
+                          editingCommunity?.isActive !== undefined
+                            ? editingCommunity.isActive.toString()
+                            : 'true'
+                        }
+                        required
+                        className="w-full px-4 py-2 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      >
+                        <option value="true">Active</option>
+                        <option value="false">Inactive</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Description */}
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                      Description <span className="text-red-500">*</span>
+                    </label>
+                    <textarea
+                      name="description"
+                      defaultValue={editingCommunity?.description || ''}
+                      required
+                      rows={4}
+                      className="w-full px-4 py-2 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      placeholder="Enter a detailed description of the community..."
+                    />
+                  </div>
+
+                  {/* Image URL */}
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                      Image URL
+                    </label>
+                    <input
+                      type="url"
+                      name="image"
+                      defaultValue={editingCommunity?.image || ''}
+                      className="w-full px-4 py-2 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      placeholder="https://example.com/image.jpg"
+                    />
+                  </div>
+
+                  {/* Form Actions */}
+                  <div className="flex space-x-3 pt-4 border-t border-neutral-200">
+                    <button
+                      type="submit"
+                      className="flex-1 px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold rounded-xl hover:from-orange-600 hover:to-orange-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                    >
+                      {editingCommunity?._id ? 'Update Community' : 'Create Community'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleCancelCommunity}
+                      className="flex-1 px-6 py-3 bg-neutral-200 text-neutral-700 font-semibold rounded-xl hover:bg-neutral-300 transition-all duration-200"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
         </div>
       </AdminLayout>
     </ProtectedRoute>
