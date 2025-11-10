@@ -29,6 +29,18 @@ interface PublicContent {
   communities: Community[]
 }
 
+const createCommunitySlug = (value?: string) => {
+  if (!value) {
+    return ''
+  }
+  return value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
 export default function HomePage() {
   const { user, logout } = useAuth()
   const router = useRouter()
@@ -502,8 +514,9 @@ export default function HomePage() {
                         <button
                           onClick={() => {
                             const community = item as Community
-                            if (community?._id) {
-                              router.push(`/communities/${community._id}`)
+                            const slug = createCommunitySlug(community?.name)
+                            if (slug) {
+                              router.push(`/communities/${slug}`)
                             }
                           }}
                           className="w-full mt-4 bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-4 rounded-xl transition-all duration-200 flex items-center justify-center"

@@ -12,6 +12,18 @@ import {
 import { communityAPI, Community, CommunityMember, CommunityPost } from '@/lib/api'
 import { useAuth } from '@/contexts/AuthContext'
 
+const createCommunitySlug = (value?: string) => {
+  if (!value) {
+    return ''
+  }
+  return value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
 const formatDate = (date?: string) => {
   if (!date) {
     return ''
@@ -44,10 +56,10 @@ type StatusMessage = {
 }
 
 export default function CommunityDetailPage() {
-  const params = useParams<{ id: string }>()
+  const params = useParams<{ name: string }>()
   const router = useRouter()
-  const communityParam = params?.id
-  const communityId = Array.isArray(communityParam) ? communityParam[0] : communityParam
+  const slugParamRaw = params?.name
+  const slugParam = Array.isArray(slugParamRaw) ? slugParamRaw[0] : slugParamRaw
 
   const { user, isLoading: authLoading } = useAuth()
 
@@ -59,7 +71,7 @@ export default function CommunityDetailPage() {
 
   const fetchCommunity = useCallback(
     async (withSpinner = true) => {
-      if (!communityId) {
+      if (!slugParam) {
         setError('Communauté introuvable.')
         setCommunity(null)
         setLoading(false)
@@ -72,7 +84,18 @@ export default function CommunityDetailPage() {
       setError('')
 
       try {
-        const data = await communityAPI.getCommunity(communityId)
+        const communitiesList = await communityAPI.getCommunities()
+        const matchingCommunity = communitiesList.find(
+          (communityItem) => createCommunitySlug(communityItem.name) === slugParam
+        )
+
+        if (!matchingCommunity) {
+          setCommunity(null)
+          setError("Nous n'avons pas pu trouver cette communauté.")
+          return
+        }
+
+        const data = await communityAPI.getCommunity(matchingCommunity._id)
 
         if (!data?.isApproved) {
           setCommunity(null)
@@ -93,7 +116,7 @@ export default function CommunityDetailPage() {
         }
       }
     },
-    [communityId]
+    [slugParam]
   )
 
   useEffect(() => {
@@ -119,7 +142,7 @@ export default function CommunityDetailPage() {
   }, [community, user])
 
   const handleJoinCommunity = async () => {
-    if (!communityId) {
+    if (!community?._id) {
       return
     }
 
@@ -132,7 +155,7 @@ export default function CommunityDetailPage() {
     setStatusMessage(null)
 
     try {
-      await communityAPI.joinCommunity(communityId)
+      await communityAPI.joinCommunity(community._id)
       setStatusMessage({
         type: 'success',
         message: 'Vous avez rejoint la communauté avec succès !',
@@ -309,7 +332,11 @@ export default function CommunityDetailPage() {
                         : 'bg-purple-500 text-white hover:bg-purple-600 disabled:bg-purple-300 disabled:cursor-not-allowed'
                     }`}
                   >
-                    {isMember ? 'Vous êtes membre' : joining ? 'Rejoindre en cours...' : 'Rejoindre la communauté'}
+                    {isMember
+                      ? 'Vous êtes membre'
+                      : joining
+                        ? 'Rejoindre en cours...'
+                        : 'Rejoindre la communauté'}
                   </button>
                   <button
                     onClick={() => router.push('/home')}
@@ -340,8 +367,8 @@ export default function CommunityDetailPage() {
             <section className="bg-white rounded-3xl shadow-lg border border-neutral-100 p-8">
               <h2 className="text-xl font-semibold text-neutral-900 mb-4">À propos</h2>
               <p className="text-neutral-600 leading-relaxed">
-                  {community.description ||
-                    "Cette communauté rassemble les étudiants et professionnels partageant des intérêts communs au sein de Campus Teranga."}
+                {community.description ||
+                  "Cette communauté rassemble les étudiants et professionnels partageant des intérêts communs au sein de Campus Teranga."}
               </p>
             </section>
 
@@ -417,12 +444,7 @@ export default function CommunityDetailPage() {
                     const memberName = memberUser?.fullName || 'Membre'
                     const memberId = memberUser?._id || member.joinedAt
                     return (
-                      <div
-                        key={
-                          memberId
-                        }
-                        className="flex items-center space-x-3"
-                      >
+                      <div key={memberId} className="flex items-center space-x-3">
                         <div className="h-12 w-12 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center font-semibold text-sm">
                           {getInitials(memberName)}
                         </div>
