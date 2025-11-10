@@ -500,7 +500,12 @@ export default function HomePage() {
                           </div>
                         </div>
                         <button
-                          onClick={() => router.push(`/communities`)}
+                          onClick={() => {
+                            const community = item as Community
+                            if (community?._id) {
+                              router.push(`/communities/${community._id}`)
+                            }
+                          }}
                           className="w-full mt-4 bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-4 rounded-xl transition-all duration-200 flex items-center justify-center"
                         >
                           <UserGroupIcon className="h-5 w-5 mr-2" />
