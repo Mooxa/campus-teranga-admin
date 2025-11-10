@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { ArrowLeftIcon } from '@heroicons/react/24/outline'
@@ -132,6 +133,15 @@ export default function LoginPage() {
                 {error}
               </div>
             )}
+
+            <div className="flex justify-end">
+              <Link
+                href="/forgot-password"
+                className="text-sm font-medium text-orange-600 hover:text-orange-700 transition-colors duration-200"
+              >
+                Forgot password?
+              </Link>
+            </div>
 
             <button
               type="submit"
